@@ -16,7 +16,7 @@ const Header: React.FC = () => {
             href="/"
             className="text-xl font-bold text-white no-underline hover:text-blue-200 transition-colors duration-200"
           >
-            アドバイザー（仮）
+            にゃんこ同盟
           </Link>
         </div>
 
