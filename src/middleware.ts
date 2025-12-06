@@ -66,8 +66,8 @@ export async function middleware(req: NextRequest) {
       // ユーザーが存在するかチェックする
       const isUser = await createOrVerifyUser(session.idToken!);
       if (isUser === "unauthorized" || isUser === 'failed') {
-      console.log("[Middleware] Not Found User. Redirecting to /login-prompt");
-        return NextResponse.redirect(new URL("/login-prompt", req.url));
+      console.log("[Middleware] Not Found User. Redirecting to /new-user");
+        return NextResponse.redirect(new URL("/new-user", req.url));
       }
 
       if (isUser === "undefined") {
@@ -113,9 +113,9 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     "/profile/:path*",
-    "/inbox/:path*",
+    "/map/:path*",
     "/home/:path*",
-    "/workout/:path*",
+    "/timeline/:path*",
     "/",
   ],
 };
