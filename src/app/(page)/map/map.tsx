@@ -9,6 +9,7 @@ import { FiCheckCircle, FiAlertCircle, FiClock } from "react-icons/fi";
 import { useGeoLocation } from "@/src/features/geoLocation/hooks/useGeoLocation";
 import { fetchPoints, registerPoint } from "@/src/features/point/hooks/usePoint";
 import { Point } from "@/src/features/point/types/point";
+import { getAuthToken } from "@/src/services/actions";
 
 type MapWithCustomModalMarkerProps = {
   zoom: number;
@@ -178,11 +179,22 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({
 
   useEffect(() => {
     const loadPoints = async () => {
-      if (session?.user?.id) {
-        const pointData = await fetchPoints(session.user.id);
-        if (pointData) {
-          setPoints(pointData);
-        }
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error("認証情報が見つかりません");
+      }
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const endpoint = `${apiUrl}/map`;
+
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: {
+          "Authorization": `${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`マップ情報取得失敗 (${response.status})`);
       }
     };
     loadPoints();

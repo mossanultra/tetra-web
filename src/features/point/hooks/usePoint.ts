@@ -34,8 +34,7 @@ export async function registerPoint(
 /** ポイント一覧取得 */
 export async function fetchPoints(userId?: string): Promise<Point[]> {
   try {
-    const path = userId ? `/api/points?userId=${userId}` : "/api/points";
-    return (await apiFetch<Point[]>(path)) ?? [];
+    return (await apiFetch<Point[]>("/map")) ?? [];
   } catch (error) {
     console.error("Error fetching points:", error);
     return [];

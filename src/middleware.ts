@@ -10,7 +10,7 @@ async function createOrVerifyUser(token: string): Promise<UserCheckResult> {
 
   try {
     // ユーザーの存在確認
-    const res = await fetch(`${baseUrl}/user/profile`, {
+    const res = await fetch(`${baseUrl}/user/profile/@self`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -38,6 +38,7 @@ async function createOrVerifyUser(token: string): Promise<UserCheckResult> {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  console.log("[Middleware] Requested Path:", pathname);
 
   // ルートパス（"/"）へのアクセスの場合 "/home" にリダイレクト
   if (pathname === "/") {
@@ -75,8 +76,7 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/login-prompt", req.url));
       }
 
-      // ユーザーのステータスをチェックする追加のAPIコール
-      const userStatusRes = await fetch(`${baseUrl}/user/profile`, {
+      const userStatusRes = await fetch(`${baseUrl}/user/profile/@self`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
