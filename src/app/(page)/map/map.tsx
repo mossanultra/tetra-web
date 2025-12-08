@@ -9,6 +9,9 @@ import { FiCheckCircle, FiAlertCircle, FiClock } from "react-icons/fi";
 import { useGeoLocation } from "@/src/features/geoLocation/hooks/useGeoLocation";
 import { fetchPoints, registerPoint } from "@/src/features/point/hooks/usePoint";
 import { Point } from "@/src/features/point/types/point";
+import { PinCreationDialog } from "@/src/features/map/components/PinCreationDialog";
+import { useImageUpload } from "@/src/features/user/hooks/useImageUpload";
+
 
 // ========== 型定義 ==========
 type MapWithCustomModalMarkerProps = {
@@ -39,8 +42,6 @@ const MAP_CONTAINER_STYLE: React.CSSProperties = {
 const DEFAULT_CENTER = { lat: 37.7608, lng: 140.473 };
 const MARKER_SIZE = 44;
 const USER_MARKER_SIZE = 30;
-
-const CATEGORIES: Category[] = ["イベント", "雑談", "告知"];
 
 // ========== アイコンコンポーネント ==========
 const EventIcon: React.FC = () => (
@@ -162,132 +163,6 @@ const MarkerContent: React.FC<{ point: PointWithMetadata; onClick?: () => void }
   );
 };
 
-// ========== ピン作成モーダルコンポーネント ==========
-const PinCreationModal: React.FC<{
-  isOpen: boolean;
-  pendingPin: PendingPin | null;
-  threadName: string;
-  category: Category;
-  savingPin: boolean;
-  onThreadNameChange: (name: string) => void;
-  onCategoryChange: (category: Category) => void;
-  onConfirm: () => void;
-  onCancel: () => void;
-}> = ({
-  isOpen,
-  pendingPin,
-  threadName,
-  category,
-  savingPin,
-  onThreadNameChange,
-  onCategoryChange,
-  onConfirm,
-  onCancel,
-}) => {
-  if (!isOpen || !pendingPin) return null;
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "rgba(0,0,0,0.4)",
-        zIndex: 9999,
-      }}
-      onClick={() => !savingPin && onCancel()}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: 360,
-          background: "#fff",
-          borderRadius: 8,
-          padding: 16,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-        }}
-      >
-        <h3 style={{ margin: "0 0 8px 0" }}>新しいピン</h3>
-        
-        <label style={{ fontSize: 12, color: "#555" }}>スレッド名</label>
-        <input
-          value={threadName}
-          onChange={(e) => onThreadNameChange(e.target.value)}
-          placeholder="スレッド名を入力"
-          style={{
-            width: "100%",
-            padding: "8px 10px",
-            marginTop: 6,
-            marginBottom: 10,
-            borderRadius: 6,
-            border: "1px solid #ddd",
-            boxSizing: "border-box",
-          }}
-        />
-        
-        <label style={{ fontSize: 12, color: "#555" }}>カテゴリ</label>
-        <select
-          value={category}
-          onChange={(e) => onCategoryChange(e.target.value as Category)}
-          style={{
-            width: "100%",
-            padding: "8px 10px",
-            marginTop: 6,
-            marginBottom: 14,
-            borderRadius: 6,
-            border: "1px solid #ddd",
-            boxSizing: "border-box",
-          }}
-        >
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-
-        <pre style={{ fontSize: 11, color: "#333", background: "#f7f7f7", padding: 8, borderRadius: 4 }}>
-          {JSON.stringify({ pendingPin, threadName, category }, null, 2)}
-        </pre>
-
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
-            onClick={onCancel}
-            style={{
-              padding: "8px 12px",
-              borderRadius: 6,
-              border: "1px solid #ccc",
-              background: "#746d7763",
-              cursor: "pointer",
-            }}
-            disabled={savingPin}
-          >
-            キャンセル
-          </button>
-          <button
-            onClick={onConfirm}
-            style={{
-              padding: "8px 12px",
-              borderRadius: 6,
-              border: "none",
-              background: "#1976d2",
-              color: "#fff",
-              cursor: "pointer",
-            }}
-            disabled={savingPin || !threadName.trim()}
-          >
-            {savingPin ? "登録中..." : "ピンを立てる"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // ========== カスタムフック: 地図の状態管理 ==========
 const useMapState = () => {
   const [center, setCenter] = useState(DEFAULT_CENTER);
@@ -327,6 +202,18 @@ const usePinCreation = (setPoints: (points: Point[]) => void) => {
   const [savingPin, setSavingPin] = useState(false);
 
   const { fetchLocation } = useGeoLocation();
+  const fileToBase64 = async (file: File): Promise<string> => {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        const base64String = result.split(",")[1];
+        resolve(base64String);
+      }
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
 
   const handleMapClick = async (event: google.maps.MapMouseEvent) => {
     if (!event.latLng) return;
@@ -347,13 +234,24 @@ const usePinCreation = (setPoints: (points: Point[]) => void) => {
     }
   };
 
-  const confirmPlacePin = async () => {
+  const confirmPlacePin = async (selectedDate?: Date, selectedImage?: File) => {
     if (!pendingPin) return;
     
     setSavingPin(true);
     try {
-      console.debug("confirmPlacePin called", { pendingPin, threadName, category });
-      await registerPoint(pendingPin.lat, pendingPin.lng, threadName, category);
+      console.debug("confirmPlacePin called", { 
+        pendingPin, 
+        threadName, 
+        category,
+        selectedDate,
+        selectedImage: selectedImage?.name 
+      });
+      let imageBase64: string | undefined = undefined;
+      if (selectedImage) {
+        imageBase64 = await fileToBase64(selectedImage);
+      }
+      // ここで selectedDate と selectedImage を使用してピンを登録
+      await registerPoint(pendingPin.lat, pendingPin.lng, selectedDate, imageBase64, threadName, category);
       const newPoints = await fetchPoints();
       setPoints(newPoints);
       resetPinState();
@@ -444,7 +342,7 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({ zoo
 
   return (
     <>
-      <PinCreationModal
+      <PinCreationDialog
         isOpen={pinCreation.pinModalOpen}
         pendingPin={pinCreation.pendingPin}
         threadName={pinCreation.threadName}
@@ -455,9 +353,7 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({ zoo
         onConfirm={pinCreation.confirmPlacePin}
         onCancel={pinCreation.cancelPin}
       />
-      
       <p>Select Map Style</p>
-      
       <GoogleMap
         mapContainerStyle={MAP_CONTAINER_STYLE}
         center={center}

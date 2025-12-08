@@ -63,7 +63,7 @@ const Header: React.FC = () => {
                 <span className="hidden md:inline">タイムライン</span>
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link 
                 href="/settings" 
                 className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
@@ -72,7 +72,7 @@ const Header: React.FC = () => {
                 <FaCog className="text-xl" />
                 <span className="hidden md:inline">設定</span>
               </Link>
-            </li>
+            </li> */}
           </ul>
         </nav>
       </div>

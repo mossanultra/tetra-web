@@ -5,8 +5,10 @@ import { Point } from "../types/point";
 export async function registerPoint(
   lat: number,
   lng: number,
+  selectedDate: Date | undefined,
+  imageBase64: string | undefined,
   threadName?: string,
-  category?: string
+  category?: string,
 ): Promise<boolean> {
   console.log("Registering point with:", { lat, lng, threadName, category });
   if (!lat || !lng) {
@@ -20,6 +22,8 @@ export async function registerPoint(
     formData.append("lng", String(lng));
     formData.append("threadName", String(threadName));
     formData.append("category", String(category));
+    formData.append("selectedDate", String(selectedDate?.toISOString()));
+    formData.append("imageBase64", String(imageBase64));
     const result = await apiFetch<{ success: boolean }>("/api/map", {
       method: "POST",
       body: formData,

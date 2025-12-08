@@ -47,6 +47,9 @@ export async function POST(request: NextRequest) {
     const lng = formData.get("lng");
     const threadName = formData.get("threadName");
     const category = formData.get("category");
+    const selectedDate = formData.get("selectedDate");
+    const imageBase64 = formData.get("imageBase64");
+    console.log("Received map POST data:", { lat, lng, threadName, category, selectedDate });
     const response = await fetch(`${apiBaseUrl}/map`, {
       method: "POST",
       headers: {
@@ -58,6 +61,8 @@ export async function POST(request: NextRequest) {
         lng,
         threadName,
         category,
+        selectedDate,
+        imageBase64
       }),
     });
 
