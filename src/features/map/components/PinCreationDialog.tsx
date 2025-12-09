@@ -16,7 +16,7 @@ type PinCreationDialogProps = {
   savingPin: boolean;
   onThreadNameChange: (name: string) => void;
   onCategoryChange: (category: Category) => void;
-  onConfirm: (selectedDate?: Date, selectedImage?: File) => void;
+  onConfirm: (selectedDate: Date | null, selectedImage: File | null) => void;
   onCancel: () => void;
 };
 
@@ -33,8 +33,8 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -53,7 +53,7 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
   };
 
   const handleRemoveImage = () => {
-    setSelectedImage(undefined);
+    setSelectedImage(null);
     setImagePreview(undefined);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -61,11 +61,11 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
   };
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const date = event.target.value ? new Date(event.target.value) : undefined;
+    const date = event.target.value ? new Date(event.target.value) : null;
     setSelectedDate(date);
   };
 
-  const formatDateForInput = (date?: Date) => {
+  const formatDateForInput = (date: Date | null) => {
     if (!date) return "";
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -76,16 +76,16 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
   const handleConfirm = () => {
     onConfirm(selectedDate, selectedImage);
     // リセット
-    setSelectedDate(undefined);
-    setSelectedImage(undefined);
+    setSelectedDate(null);
+    setSelectedImage(null);
     setImagePreview(undefined);
   };
 
   const handleCancel = () => {
     onCancel();
     // リセット
-    setSelectedDate(undefined);
-    setSelectedImage(undefined);
+    setSelectedDate(null);
+    setSelectedImage(null);
     setImagePreview(undefined);
   };
 

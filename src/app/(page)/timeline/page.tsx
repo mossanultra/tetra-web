@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { FaRegComment, FaRegBookmark, FaBookmark } from "react-icons/fa";
+import { useState, useEffect, useRef } from "react";
+import { FaRegComment, FaRegBookmark, FaBookmark, FaTimes, FaImage } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 // getAuthToken は元のファイルからインポート
@@ -31,6 +31,15 @@ const TimelinePage = () => {
   const [error, setError] = useState<string | null>(null);
   const [openImage, setOpenImage] = useState<string | null>(null);
   const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(new Set());
+  
+  // 返信モーダル関連
+  const [replyModalOpen, setReplyModalOpen] = useState(false);
+  const [replyTarget, setReplyTarget] = useState<ThreadDTO | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replyImage, setReplyImage] = useState<string | null>(null);
+  const [replyImageFile, setReplyImageFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchTimeline();
@@ -88,9 +97,79 @@ const TimelinePage = () => {
     });
   };
 
-  const handleReply = (threadId: string) => {
-    console.log("Reply to:", threadId);
-    // リプライ処理をここに実装
+  const handleReply = (thread: ThreadDTO) => {
+    setReplyTarget(thread);
+    setReplyModalOpen(true);
+    setReplyText("");
+    setReplyImage(null);
+    setReplyImageFile(null);
+  };
+
+  const closeReplyModal = () => {
+    setReplyModalOpen(false);
+    setReplyTarget(null);
+    setReplyText("");
+    setReplyImage(null);
+    setReplyImageFile(null);
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setReplyImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setReplyImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setReplyImage(null);
+    setReplyImageFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const submitReply = async () => {
+    if (!replyText.trim() || !replyTarget) return;
+
+    setSubmitting(true);
+
+    try {
+      // const token = await getAuthToken();
+      // if (!token) throw new Error("認証エラー");
+
+      const body = {
+        threadName: replyText,
+        parentThreadId: replyTarget.threadId,
+        imageBase64: replyImage || null,
+      };
+
+      const res = await fetch("/api/timeline/thread/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: token,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        throw new Error(`返信の投稿に失敗しました (${res.status})`);
+      }
+
+      // 成功したらモーダルを閉じてタイムラインを更新
+      closeReplyModal();
+      await fetchTimeline();
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "返信の投稿に失敗しました");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const toggleBookmark = (threadId: string) => {
@@ -112,22 +191,6 @@ const TimelinePage = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-2xl mx-auto border-x border-gray-200 min-h-screen">
-        {/* ヘッダー */}
-        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200">
-          <div className="flex items-center justify-between px-4 py-3">
-            <h2 className="text-xl font-bold text-gray-900">タイムライン</h2>
-            <button
-              onClick={fetchTimeline}
-              disabled={loading}
-              className={`px-4 py-1.5 text-sm font-semibold text-white rounded-full bg-blue-500 hover:bg-blue-600 transition ${
-                loading ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {loading ? "読み込み中..." : "更新"}
-            </button>
-          </div>
-        </div>
-
         {/* エラー */}
         {error && (
           <div className="mx-4 mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">
@@ -166,6 +229,7 @@ const TimelinePage = () => {
             <article
               key={t.threadId}
               className="px-4 py-3 hover:bg-gray-50 transition cursor-pointer"
+              onClick={() => router.push(`/timeline/${t.threadId}`)}
             >
               <div className="flex gap-3">
                 {/* アイコン */}
@@ -231,7 +295,7 @@ const TimelinePage = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleReply(t.threadId);
+                        handleReply(t);
                       }}
                       className="flex items-center gap-2 group hover:text-blue-500 transition"
                     >
@@ -289,6 +353,124 @@ const TimelinePage = () => {
             className="max-w-full max-h-full object-contain rounded-lg"
             onClick={(e) => e.stopPropagation()}
           />
+        </div>
+      )}
+
+      {/* 返信モーダル */}
+      {replyModalOpen && replyTarget && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-4 pt-12 overflow-y-auto"
+          onClick={closeReplyModal}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* モーダルヘッダー */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <button
+                onClick={closeReplyModal}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+              >
+                <FaTimes className="w-5 h-5 text-gray-700" />
+              </button>
+              <h3 className="text-lg font-bold text-gray-900">返信</h3>
+              <div className="w-9"></div>
+            </div>
+
+            {/* 元の投稿 */}
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex gap-3">
+                <img
+                  src={replyTarget.ownerUserProfile.imageUrl ?? "/default-user.png"}
+                  alt={replyTarget.ownerUserProfile.userName}
+                  className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-gray-900">
+                      {replyTarget.ownerUserProfile.userName}
+                    </span>
+                    <span className="text-gray-500 text-sm">
+                      · {formatDate(replyTarget.createdAt)}
+                    </span>
+                  </div>
+                  <div className="text-gray-900 text-sm">
+                    {replyTarget.threadName}
+                  </div>
+                  {replyTarget.imageUrl && (
+                    <img
+                      src={replyTarget.imageUrl}
+                      alt="元の投稿画像"
+                      className="mt-2 rounded-xl max-h-40 object-cover"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="ml-[52px] mt-2 text-sm text-gray-500">
+                返信先: <span className="text-blue-500">@{replyTarget.ownerUserProfile.userName}</span>
+              </div>
+            </div>
+
+            {/* 返信入力エリア */}
+            <div className="p-4">
+              <textarea
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="返信を入力"
+                className="w-full min-h-[120px] text-gray-900 text-lg resize-none outline-none placeholder-gray-400"
+                autoFocus
+              />
+
+              {/* プレビュー画像 */}
+              {replyImage && (
+                <div className="relative mt-3 inline-block">
+                  <img
+                    src={replyImage}
+                    alt="プレビュー"
+                    className="rounded-xl max-h-60 object-cover"
+                  />
+                  <button
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 p-1.5 bg-gray-900/70 hover:bg-gray-900 rounded-full transition"
+                  >
+                    <FaTimes className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* モーダルフッター */}
+            <div className="flex items-center justify-between p-4 border-t border-gray-200">
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2 hover:bg-blue-50 rounded-full transition text-blue-500"
+                >
+                  <FaImage className="w-5 h-5" />
+                </button>
+              </div>
+
+              <button
+                onClick={submitReply}
+                disabled={!replyText.trim() || submitting}
+                className={`px-6 py-2 text-sm font-semibold text-white rounded-full transition ${
+                  !replyText.trim() || submitting
+                    ? "bg-blue-300 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                }`}
+              >
+                {submitting ? "投稿中..." : "返信"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

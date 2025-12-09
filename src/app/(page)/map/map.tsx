@@ -234,9 +234,9 @@ const usePinCreation = (setPoints: (points: Point[]) => void) => {
     }
   };
 
-  const confirmPlacePin = async (selectedDate?: Date, selectedImage?: File) => {
+  const confirmPlacePin = async (selectedDate: Date | null, selectedImage: File | null) => {
     if (!pendingPin) return;
-    
+
     setSavingPin(true);
     try {
       console.debug("confirmPlacePin called", { 
@@ -246,7 +246,7 @@ const usePinCreation = (setPoints: (points: Point[]) => void) => {
         selectedDate,
         selectedImage: selectedImage?.name 
       });
-      let imageBase64: string | undefined = undefined;
+      let imageBase64: string | null = null;
       if (selectedImage) {
         imageBase64 = await fileToBase64(selectedImage);
       }

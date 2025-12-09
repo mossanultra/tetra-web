@@ -5,10 +5,10 @@ import { Point } from "../types/point";
 export async function registerPoint(
   lat: number,
   lng: number,
-  selectedDate: Date | undefined,
-  imageBase64: string | undefined,
-  threadName?: string,
-  category?: string,
+  selectedDate: Date | null,
+  imageBase64: string | null,
+  threadName: string,
+  category: string,
 ): Promise<boolean> {
   console.log("Registering point with:", { lat, lng, threadName, category });
   if (!lat || !lng) {

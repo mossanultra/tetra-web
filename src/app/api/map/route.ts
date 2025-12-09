@@ -1,6 +1,7 @@
 // app/api/user/route.ts
 import { auth } from "@/src/services/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getFormValue } from "../helper";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
@@ -47,8 +48,8 @@ export async function POST(request: NextRequest) {
     const lng = formData.get("lng");
     const threadName = formData.get("threadName");
     const category = formData.get("category");
-    const selectedDate = formData.get("selectedDate");
-    const imageBase64 = formData.get("imageBase64");
+    const selectedDate = getFormValue(formData.get("selectedDate"));
+    const imageBase64 = getFormValue(formData.get("imageBase64"));
     console.log("Received map POST data:", { lat, lng, threadName, category, selectedDate });
     const response = await fetch(`${apiBaseUrl}/map`, {
       method: "POST",
