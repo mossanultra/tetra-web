@@ -212,13 +212,6 @@ const ProfilePage = () => {
             <h2 className="text-3xl font-extrabold text-gray-800 mb-2 tracking-tight">
               {isEditing ? "プロフィール編集" : "プロフィール"}
             </h2>
-            <p className="text-sm text-gray-500 mt-2">
-              {isEditing
-                ? "情報を編集してください"
-                : isOwnProfile 
-                  ? "あなたのプロフィール情報"
-                  : `${userData.nickname}のプロフィール`}
-            </p>
           </div>
 
           {error && <AlertMessage message={error} type="error" />}

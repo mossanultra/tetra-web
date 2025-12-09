@@ -35,7 +35,7 @@ const Header: React.FC = () => {
             </li>
             <li>
               <Link 
-                href="/profile" 
+                href="/profile/@self" 
                 className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
                 title="プロフィール"
               >
