@@ -25,6 +25,9 @@ export async function GET(
         Authorization: `${session.idToken}`,
       },
     });
+    if(response.status === 404) {
+      return NextResponse.json({ error: "Thread not found" }, { status: 404 });
+    }
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
