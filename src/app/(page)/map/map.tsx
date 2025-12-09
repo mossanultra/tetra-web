@@ -314,11 +314,11 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({ zoo
       <CustomMarker
         key={point.id}
         position={{ lat: point.lat, lng: point.lng }}
-        onClick={() => handleMarkerClick(point)}
+        // onClick={() => handleMarkerClick(point)}
       >
         <MarkerContent 
           point={point as PointWithMetadata} 
-          onClick={() => handleMarkerClick(point)} 
+          // onClick={() => handleMarkerClick(point)} 
         />
       </CustomMarker>
     );

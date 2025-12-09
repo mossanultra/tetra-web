@@ -7,6 +7,7 @@ import { SuccessToast } from "@/src/features/user/components/SuccessToast";
 import { useImageUpload } from "@/src/features/user/hooks/useImageUpload";
 import { getAuthToken } from "@/src/services/actions";
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 
 interface UserProfile {
   profileId: string;
@@ -16,11 +17,15 @@ interface UserProfile {
 }
 
 const ProfilePage = () => {
+  const params = useParams();
+  const userId = params?.userId as string | undefined;
+  
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
 
   const {
     imagePreview,
@@ -44,7 +49,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, []);
+  }, [userId]);
 
   const fetchProfile = async () => {
     setIsFetching(true);
@@ -56,7 +61,10 @@ const ProfilePage = () => {
         throw new Error("認証情報が見つかりません");
       }
 
-      const endpoint = `/api/user/profile/@self`;
+      // userIdがない場合は自分自身のプロフィール、ある場合は指定されたユーザー
+      const endpoint = userId 
+        ? `/api/user/profile/${userId}`
+        : `/api/user/profile/@self`;
 
       const response = await fetch(endpoint, {
         method: "GET",
@@ -67,6 +75,18 @@ const ProfilePage = () => {
       }
 
       const data: UserProfile = await response.json();
+      
+      // 自分自身のプロフィールかどうかを判定
+      // userIdがないか、取得したprofileIdが自分のものと一致する場合
+      const selfResponse = await fetch(`/api/user/profile/@self`, {
+        method: "GET",
+      });
+      
+      if (selfResponse.ok) {
+        const selfData: UserProfile = await selfResponse.json();
+        setIsOwnProfile(!userId || data.profileId === selfData.profileId);
+      }
+      
       setOriginalData(data);
       setUserData({
         nickname: data.userName,
@@ -195,7 +215,9 @@ const ProfilePage = () => {
             <p className="text-sm text-gray-500 mt-2">
               {isEditing
                 ? "情報を編集してください"
-                : "あなたのプロフィール情報"}
+                : isOwnProfile 
+                  ? "あなたのプロフィール情報"
+                  : `${userData.nickname}のプロフィール`}
             </p>
           </div>
 
@@ -245,45 +267,47 @@ const ProfilePage = () => {
                 disabled={!isEditing}
               />
 
-              <div className="pt-4">
-                {isEditing ? (
-                  <div className="flex gap-3">
+              {isOwnProfile && (
+                <div className="pt-4">
+                  {isEditing ? (
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={handleCancel}
+                        disabled={isLoading}
+                        className="flex-1 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-3 focus:ring-gray-300/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        キャンセル
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className={`flex-1 flex justify-center items-center px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 border-0 rounded-lg shadow-md cursor-pointer transition-[background,transform] duration-200 hover:from-indigo-700 hover:to-purple-800 hover:-translate-y-0.5 focus:outline-none focus:ring-3 focus:ring-indigo-600/40 active:translate-y-0.5 ${
+                          isLoading ? "opacity-70 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        {isLoading ? (
+                          <>
+                            <span className="inline-block w-5 h-5 mr-3 border-2 border-white/30 rounded-full border-t-white animate-spin"></span>
+                            保存中...
+                          </>
+                        ) : (
+                          <>保存する</>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
                     <button
                       type="button"
-                      onClick={handleCancel}
-                      disabled={isLoading}
-                      className="flex-1 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-3 focus:ring-gray-300/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleEdit}
+                      className="w-full flex justify-center items-center px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 border-0 rounded-lg shadow-md cursor-pointer transition-[background,transform] duration-200 hover:from-indigo-700 hover:to-purple-800 hover:-translate-y-0.5 focus:outline-none focus:ring-3 focus:ring-indigo-600/40 active:translate-y-0.5"
                     >
-                      キャンセル
+                      編集する
                     </button>
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      disabled={isLoading}
-                      className={`flex-1 flex justify-center items-center px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 border-0 rounded-lg shadow-md cursor-pointer transition-[background,transform] duration-200 hover:from-indigo-700 hover:to-purple-800 hover:-translate-y-0.5 focus:outline-none focus:ring-3 focus:ring-indigo-600/40 active:translate-y-0.5 ${
-                        isLoading ? "opacity-70 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="inline-block w-5 h-5 mr-3 border-2 border-white/30 rounded-full border-t-white animate-spin"></span>
-                          保存中...
-                        </>
-                      ) : (
-                        <>保存する</>
-                      )}
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleEdit}
-                    className="w-full flex justify-center items-center px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-700 border-0 rounded-lg shadow-md cursor-pointer transition-[background,transform] duration-200 hover:from-indigo-700 hover:to-purple-800 hover:-translate-y-0.5 focus:outline-none focus:ring-3 focus:ring-indigo-600/40 active:translate-y-0.5"
-                  >
-                    編集する
-                  </button>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
