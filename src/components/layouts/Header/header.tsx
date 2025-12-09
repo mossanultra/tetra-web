@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { FaHome, FaUser, FaCog } from "react-icons/fa";
+import { FaHome, FaUser, FaCog, FaRegCalendar } from "react-icons/fa";
 import { GiNotebook } from "react-icons/gi";
 import { MdFitnessCenter } from "react-icons/md";
 import HamburgerButton from "./HamburgerButton";
@@ -61,6 +61,16 @@ const Header: React.FC = () => {
               >
                 <MdFitnessCenter className="text-xl" />
                 <span className="hidden md:inline">タイムライン</span>
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href="/calender" 
+                className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
+                title="カレンダー"
+              >
+                <FaRegCalendar className="text-xl" />
+                <span className="hidden md:inline">カレンダー</span>
               </Link>
             </li>
             {/* <li>
