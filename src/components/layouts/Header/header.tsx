@@ -3,12 +3,11 @@ import Link from "next/link";
 import { FaHome, FaUser, FaCog, FaRegCalendar } from "react-icons/fa";
 import { GiNotebook } from "react-icons/gi";
 import { MdFitnessCenter } from "react-icons/md";
-import HamburgerButton from "./HamburgerButton";
 
 const Header: React.FC = () => {
   return (
     <header className="text-white shadow-md">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div className="px-4 h-16 flex justify-between items-center">
         {/* 左側：ハンバーガーメニュー + ロゴ */}
         <div className="flex items-center gap-2">
           {/* <HamburgerButton className="md:hidden bg-none border-none text-2xl text-blue-600 cursor-pointer mr-3" /> */}
@@ -31,16 +30,6 @@ const Header: React.FC = () => {
               >
                 <FaHome className="text-xl" />
                 <span className="hidden md:inline">ホーム</span>
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/profile/@self" 
-                className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
-                title="プロフィール"
-              >
-                <FaUser className="text-xl" />
-                <span className="hidden md:inline">プロフィール</span>
               </Link>
             </li>
             <li>
@@ -73,16 +62,16 @@ const Header: React.FC = () => {
                 <span className="hidden md:inline">カレンダー</span>
               </Link>
             </li>
-            {/* <li>
+            <li>
               <Link 
-                href="/settings" 
+                href="/profile/@self" 
                 className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
-                title="設定"
+                title="プロフィール"
               >
-                <FaCog className="text-xl" />
-                <span className="hidden md:inline">設定</span>
+                <FaUser className="text-xl" />
+                <span className="hidden md:inline">プロフィール</span>
               </Link>
-            </li> */}
+            </li>
           </ul>
         </nav>
       </div>
