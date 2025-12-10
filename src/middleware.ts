@@ -42,7 +42,7 @@ export async function middleware(req: NextRequest) {
 
   // ルートパス（"/"）へのアクセスの場合 "/home" にリダイレクト
   if (pathname === "/") {
-    return NextResponse.redirect(new URL("/home", req.url));
+    return NextResponse.redirect(new URL("/map", req.url));
   }
 
   try {
