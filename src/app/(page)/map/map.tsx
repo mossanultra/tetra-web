@@ -10,7 +10,6 @@ import { useGeoLocation } from "@/src/features/geoLocation/hooks/useGeoLocation"
 import { fetchPoints, registerPoint } from "@/src/features/point/hooks/usePoint";
 import { Point } from "@/src/features/point/types/point";
 import { PinCreationDialog } from "@/src/features/map/components/PinCreationDialog";
-import { useImageUpload } from "@/src/features/user/hooks/useImageUpload";
 
 
 // ========== 型定義 ==========

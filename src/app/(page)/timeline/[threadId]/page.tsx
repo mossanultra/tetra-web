@@ -1,10 +1,12 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { FaRegComment } from "react-icons/fa";
+import { useParams } from "next/navigation";
+import { ThreadCard } from "@/src/features/thread/components/ThreadCard";
+import { ReplyModal } from "@/src/features/thread/components/ReplyModal";
+import { ImageModal } from "@/src/features/thread/components/ImageModal";
+import { ThreadSkeleton } from "@/src/features/thread/components/ThreadSkeleton";
 
-interface ThreadDTO {
+export interface ThreadDTO {
   threadId: string;
   threadName: string;
   createdAt: string;
@@ -28,44 +30,35 @@ interface ThreadResponse {
   parentThread: ThreadDTO | null;
 }
 
-// ------------------------------
-// 日付フォーマット
-// ------------------------------
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = Math.floor((now.getTime() - d.getTime()) / 1000);
-
-  if (diff < 60) return `${diff}秒前`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}分前`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}時間前`;
-  if (diff < 86400 * 7) return `${Math.floor(diff / 86400)}日前`;
-
-  return d.toLocaleDateString("ja-JP", { month: "short", day: "numeric" });
-};
-
 export default function ThreadPage() {
   const params = useParams();
-  const router = useRouter();
   const threadId = params.threadId as string;
 
   const [thread, setThread] = useState<ThreadDTO | null>(null);
   const [childThreads, setChildThreads] = useState<ThreadDTO[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(new Set());
 
-  // ------------------------------
-  // 初期データ取得
-  // ------------------------------
+  // --- モーダル関連 ---
+  const [replyModalOpen, setReplyModalOpen] = useState(false);
+  const [replyTarget, setReplyTarget] = useState<ThreadDTO | null>(null);
+  const [openImage, setOpenImage] = useState<string | null>(null);
+
   useEffect(() => {
     fetchThread();
   }, [threadId]);
 
   const fetchThread = async () => {
     setLoading(true);
+    setError(null);
 
     try {
       const res = await fetch(`/api/timeline/${threadId}`);
-      if (!res.ok) throw new Error("取得に失敗しました");
+
+      if (!res.ok) {
+        throw new Error(`スレッド取得に失敗しました (${res.status})`);
+      }
 
       const data: ThreadResponse = await res.json();
 
@@ -73,99 +66,123 @@ export default function ThreadPage() {
       setChildThreads(data.childThreads.map((c) => c.thread));
     } catch (e) {
       console.error(e);
+      setError("スレッド情報の取得に失敗しました");
     } finally {
       setLoading(false);
     }
   };
 
-  // ------------------------------
-  // スレッドカード（親・子共通）
-  // ------------------------------
-  const ThreadCard = ({
-    data,
-    isChild = false,
-  }: {
-    data: ThreadDTO;
-    isChild?: boolean;
-  }) => (
-    <div
-      className={`flex gap-3 px-4 py-4 ${
-        isChild ? "ml-10 border-l border-gray-300" : ""
-      }`}
-    >
-      {/* プロフィール画像 */}
-      <img
-        src={data.ownerUserProfile.imageUrl ?? "/default-user.png"}
-        alt={data.ownerUserProfile.userName}
-        className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80"
-        onClick={() => router.push(`/profile/${data.ownerUserId}`)}
-      />
-      {/* 右側コンテンツ */}
-      <div className="flex-1 min-w-0">
-        {/* 名前 & 日付 */}
-        <div className="flex items-center gap-2">
-          <span
-            className="font-bold text-gray-900 hover:underline cursor-pointer"
-            onClick={() => router.push(`/profile/${data.ownerUserId}`)}
-          >
-            {data.ownerUserProfile.userName}
-          </span>
-          <span className="text-gray-500 text-sm">· {formatDate(data.createdAt)}</span>
-        </div>
+  const handleReply = (thread: ThreadDTO) => {
+    setReplyTarget(thread);
+    setReplyModalOpen(true);
+  };
 
-        {/* 本文 */}
-        <p className="text-gray-900 whitespace-pre-wrap break-words mt-1">
-          {data.threadName}
-        </p>
+  const closeReplyModal = () => {
+    setReplyModalOpen(false);
+    setReplyTarget(null);
+  };
 
-        {/* 画像 */}
-        {data.imageUrl && (
-          <img
-            src={data.imageUrl}
-            className="mt-3 rounded-xl border border-gray-200 max-h-96 object-cover"
-            alt="thread image"
+  const submitReply = async (text: string, image: string | null) => {
+    if (!replyTarget) return;
+
+    const body = {
+      threadName: text,
+      parentThreadId: replyTarget.threadId,
+      imageBase64: image || null,
+    };
+
+    const res = await fetch("/api/timeline/thread/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      throw new Error(`返信の投稿に失敗しました (${res.status})`);
+    }
+
+    closeReplyModal();
+    await fetchThread();
+  };
+
+  const toggleBookmark = (threadId: string) => {
+    setBookmarkedThreads((prev) => {
+      const set = new Set(prev);
+      set.has(threadId) ? set.delete(threadId) : set.add(threadId);
+      return set;
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="max-w-2xl mx-auto border-x border-gray-200 min-h-screen overflow-y-auto">
+
+        {/* --- エラー --- */}
+        {error && (
+          <div className="m-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">
+            {error}
+          </div>
+        )}
+
+        {/* --- ローディング --- */}
+        {loading && <ThreadSkeleton count={3} />}
+
+        {/* --- 親スレッド --- */}
+        {!loading && thread && (
+          <ThreadCard
+            thread={thread}
+            onReply={handleReply}
+            onImageClick={setOpenImage}
+            isBookmarked={bookmarkedThreads.has(thread.threadId)}
+            onToggleBookmark={toggleBookmark}
+            isCompact={false}
           />
         )}
 
-        {/* 子スレッド数 */}
-        <div className="flex items-center gap-1 text-gray-500 mt-3">
-          <FaRegComment className="w-4 h-4" />
-          {data.childThreadCount > 0 && (
-            <span className="text-sm">{data.childThreadCount}</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  // ------------------------------
-  // レンダリング
-  // ------------------------------
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-2xl mx-auto border-x border-gray-200 min-h-screen">
-        {/* ローディング */}
-        {loading && (
-          <div className="p-6 text-center text-gray-500">読み込み中...</div>
-        )}
-
-        {/* 親スレッド */}
-        {!loading && thread && <ThreadCard data={thread} />}
-
-        {/* 子スレッド */}
+        {/* --- 子スレッド一覧 --- */}
         {!loading && childThreads.length > 0 && (
-          <div className="border-t border-gray-200">
+          <div className="divide-y divide-gray-200">
             {childThreads.map((child) => (
-              <ThreadCard key={child.threadId} data={child} isChild />
+              <div
+                key={child.threadId}
+                className="relative pl-10" // 子スレッドを右にずらす
+              >
+                {/* 左の縦ライン（X風） */}
+                {/* <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-300" /> */}
+
+                <ThreadCard
+                  thread={child}
+                  onReply={handleReply}
+                  onImageClick={setOpenImage}
+                  isBookmarked={bookmarkedThreads.has(child.threadId)}
+                  onToggleBookmark={toggleBookmark}
+                  isCompact={true}
+                />
+              </div>
             ))}
           </div>
         )}
 
-        {/* スレッドなし */}
+        {/* --- スレッドがない場合 --- */}
         {!loading && !thread && (
-          <div className="p-6 text-center text-gray-500">スレッドが見つかりません</div>
+          <div className="p-6 text-center text-gray-500">
+            スレッドが見つかりませんでした
+          </div>
         )}
       </div>
+
+      {/* --- 返信モーダル --- */}
+      <ReplyModal
+        isOpen={replyModalOpen}
+        replyTarget={replyTarget}
+        onClose={closeReplyModal}
+        onSubmit={submitReply}
+      />
+
+      {/* --- 画像モーダル --- */}
+      <ImageModal imageUrl={openImage} onClose={() => setOpenImage(null)} />
     </div>
   );
 }
