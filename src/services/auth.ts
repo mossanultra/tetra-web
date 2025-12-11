@@ -112,6 +112,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       issuer: cognitoIssuer,
       clientId: cognitoClientId,
       clientSecret: cognitoClientSecret,
+      authorization: {
+        params: {
+          scope: "openid email",
+        },
+    },
     }),
   ],
   callbacks: {
