@@ -39,7 +39,16 @@ export async function registerPoint(
 /** ポイント一覧取得 */
 export async function fetchPoints(): Promise<Point[]> {
   try {
-    return (await apiFetch<Point[]>("/api/map")) ?? [];
+    const result = await apiFetch<Point[]>("/api/map");
+
+    if (!result) return [];
+
+    // lat / lng を number に変換して返却
+    return result.map((p) => ({
+      ...p,
+      lat: Number(p.lat),
+      lng: Number(p.lng),
+    }));
   } catch (error) {
     console.error("Error fetching points:", error);
     return [];
