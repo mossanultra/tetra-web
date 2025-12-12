@@ -205,7 +205,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-500 p-4 relative">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br ">
       <div className="max-w-[480px] w-full bg-white rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.2)] overflow-hidden relative z-10">
         <div className="p-8 sm:p-6">
           <div className="text-center mb-8">

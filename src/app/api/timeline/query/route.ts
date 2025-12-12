@@ -11,23 +11,17 @@ export async function GET(request: NextRequest) {
     if (!session?.idToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.log("Thread SelectRange API called");
-
     // クエリ取得
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
     const limit = searchParams.get("limit");
 
-    console.log("Query params:", { startDate, endDate, limit });
-
     // バックエンド API の URL を組み立て
     const url = new URL(`${apiBaseUrl}/timeline/query`);
     if (startDate) url.searchParams.append("startDate", startDate);
     if (endDate) url.searchParams.append("endDate", endDate);
     if (limit) url.searchParams.append("limit", limit);
-
-    console.log("Fetching from URL:", url.toString());
 
     // 外部 API 呼び出し
     const response = await fetch(url.toString(), {

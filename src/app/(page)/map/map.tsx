@@ -35,7 +35,7 @@ type PointWithMetadata = Point & {
 // ========== 定数 ==========
 const MAP_CONTAINER_STYLE: React.CSSProperties = {
   width: "100%",
-  height: "600px",
+  height: "100%",
 };
 
 const DEFAULT_CENTER = { lat: 37.7608, lng: 140.473 };

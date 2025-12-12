@@ -114,7 +114,7 @@ export const config = {
   matcher: [
     "/profile/:path*",
     "/map/:path*",
-    "/home/:path*",
+    "/calender/:path*",
     "/timeline/:path*",
     "/",
   ],

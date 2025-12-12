@@ -76,6 +76,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Refresh failed" }, { status: 500 });
   }
 }
-
-// userNameにはCognitoユーザープールの「ユーザー名」を渡す必要があります
-// 通常はCognitoユーザープールの「ユーザー名」ですが、emailやsubなどを渡している場合は一致しません。

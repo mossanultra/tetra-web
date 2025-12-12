@@ -129,7 +129,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       return true;
     },
     async redirect() {
-      return "/home";
+      return "/map";
     },
     async jwt({ token, account, user }) {
       // 初回サインイン時

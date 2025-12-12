@@ -284,7 +284,7 @@ const TimelinePage = () => {
                           e.stopPropagation();
                           setOpenImage(t.imageUrl!);
                         }}
-                        className="rounded-2xl w-full object-cover max-h-96 border border-gray-200 cursor-pointer hover:opacity-95 transition"
+                        className="rounded-2xl w-9/12 object-cover max-h-96 border border-gray-200 cursor-pointer hover:opacity-95 transition"
                       />
                     </div>
                   )}
