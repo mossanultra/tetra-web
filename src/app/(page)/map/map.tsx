@@ -35,7 +35,7 @@ type PointWithMetadata = Point & {
 // ========== 定数 ==========
 const MAP_CONTAINER_STYLE: React.CSSProperties = {
   width: "100%",
-  height: "100%",
+  height: "600px",
 };
 
 const DEFAULT_CENTER = { lat: 37.7608, lng: 140.473 };
@@ -132,12 +132,15 @@ const MarkerContent: React.FC<{ point: PointWithMetadata; onClick?: () => void }
         alignItems: "center",
         gap: 8,
         padding: "6px 8px",
-        background: "rgba(255,255,255,0.95)",
+        backgroundColor: "white",        // ← 透過をやめて solid に
         borderRadius: 12,
         boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
         transform: "translate(-50%, -100%)",
         cursor: "pointer",
         whiteSpace: "nowrap",
+        position: "relative",            // ← 追加
+        zIndex: 9999,                    // ← 追加（最重要）
+        pointerEvents: "auto",           // ← 念のため追加、クリック無効化対策
       }}
     >
       <div style={{ width: MARKER_SIZE, height: MARKER_SIZE, flexShrink: 0 }}>
@@ -293,6 +296,7 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({ zoo
   const { data: session, status } = useSession();
   const { center, pointList, setPoints } = useMapState();
   const pinCreation = usePinCreation(setPoints);
+  const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPoints = async () => {
@@ -308,20 +312,36 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({ zoo
     router.push(`/timeline/${marker.id}`);
   };
 
-  const renderMarker = (point: Point) => {
-    return (
-      <CustomMarker
-        key={point.id}
+const renderMarker = (point: Point) => {
+  return (
+    <React.Fragment key={point.id}>
+      {/* デフォルトマーカー */}
+      <Marker
         position={{ lat: point.lat, lng: point.lng }}
-        onClick={() => handleMarkerClick(point)}
-      >
-        <MarkerContent 
-          point={point as PointWithMetadata} 
-          onClick={() => handleMarkerClick(point)} 
-        />
-      </CustomMarker>
-    );
-  };
+        onClick={() => setSelectedPointId(point.id)}
+      />
+
+      {/* クリックされたときだけ表示されるカスタム吹き出し */}
+      {selectedPointId === point.id && (
+        <OverlayView
+          position={{ lat: point.lat, lng: point.lng }}
+          mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+        >
+          <div style={{ 
+            transform: "translate(-50%, -100%)",
+            position: "relative",
+            zIndex: 10000  // ← 追加
+          }}>
+            <MarkerContent
+              point={point as PointWithMetadata}
+              onClick={() => router.push(`/timeline/${point.id}`)}
+            />
+          </div>
+        </OverlayView>
+      )}
+    </React.Fragment>
+  );
+};
 
   if (status === "loading") {
     return <p>Loading...</p>;
@@ -358,7 +378,9 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({ zoo
         zoom={zoom}
         onClick={pinCreation.handleMapClick}
       >
-        {pointList?.map((point) => renderMarker(point))}
+        {pointList?.map((point) => 
+          renderMarker(point)
+        )}
         <Marker
           position={center}
           icon={{
