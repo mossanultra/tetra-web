@@ -110,6 +110,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
           className={`${avatarSize} rounded-full object-cover cursor-pointer hover:opacity-80 transition flex-shrink-0`}
         />
 
+
         {/* コンテンツ */}
         <div className="flex-1 min-w-0">
           {/* ユーザー情報 */}
@@ -145,7 +146,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
                 src={thread.imageUrl}
                 alt="投稿画像"
                 onClick={onImageClick ? handleImageClick : undefined}
-                className={`rounded-2xl w-full object-cover border border-gray-200 ${
+                className={`rounded-2xl w-9/12 object-cover border border-gray-200 ${
                   onImageClick ? "cursor-pointer hover:opacity-95" : ""
                 } ${isCompact ? "max-h-32 rounded-lg" : "max-h-96"} transition`}
               />

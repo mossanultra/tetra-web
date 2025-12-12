@@ -1,7 +1,5 @@
-"use client";
 import Footer from "@/src/components/layouts/Footer/footer";
 import Header from "@/src/components/layouts/Header/header";
-import Sidebar from "@/src/components/layouts/Sidebar/Sidebar";
 import React from "react";
 
 interface LayoutContentProps {

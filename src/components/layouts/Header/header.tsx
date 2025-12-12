@@ -1,16 +1,20 @@
 import React from "react";
 import Link from "next/link";
-import { FaHome, FaUser, FaCog, FaRegCalendar } from "react-icons/fa";
-import { GiNotebook } from "react-icons/gi";
-import { MdFitnessCenter } from "react-icons/md";
+import { 
+  FaUser, 
+  FaRegCalendar, 
+  FaSignOutAlt, 
+  FaMapMarkedAlt, 
+  FaStream 
+} from "react-icons/fa";
 
 const Header: React.FC = () => {
   return (
     <header className="text-white shadow-md">
       <div className="px-4 h-16 flex justify-between items-center">
-        {/* 左側：ハンバーガーメニュー + ロゴ */}
+
+        {/* 左：ロゴ */}
         <div className="flex items-center gap-2">
-          {/* <HamburgerButton className="md:hidden bg-none border-none text-2xl text-blue-600 cursor-pointer mr-3" /> */}
           <Link
             href="/"
             className="text-xl font-bold text-white no-underline hover:text-blue-200 transition-colors duration-200"
@@ -19,39 +23,35 @@ const Header: React.FC = () => {
           </Link>
         </div>
 
-        {/* 右側：ナビゲーションアイコン */}
+        {/* 右：ナビゲーション */}
         <nav className="flex items-center">
           <ul className="flex list-none m-0 p-0 gap-6 items-center">
-            {/* <li>
-              <Link 
-                href="/home" 
-                className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
-                title="ホーム"
-              >
-                <FaHome className="text-xl" />
-                <span className="hidden md:inline">ホーム</span>
-              </Link>
-            </li> */}
+
+            {/* マップ */}
             <li>
               <Link 
                 href="/map" 
                 className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
                 title="地図"
               >
-                <GiNotebook className="text-xl" />
+                <FaMapMarkedAlt className="text-xl" />
                 <span className="hidden md:inline">マップ</span>
               </Link>
             </li>
+
+            {/* タイムライン */}
             <li>
               <Link 
                 href="/timeline" 
                 className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
                 title="タイムライン"
               >
-                <MdFitnessCenter className="text-xl" />
+                <FaStream className="text-xl" />
                 <span className="hidden md:inline">タイムライン</span>
               </Link>
             </li>
+
+            {/* カレンダー */}
             <li>
               <Link 
                 href="/calender" 
@@ -62,6 +62,8 @@ const Header: React.FC = () => {
                 <span className="hidden md:inline">カレンダー</span>
               </Link>
             </li>
+
+            {/* プロフィール */}
             <li>
               <Link 
                 href="/profile/@self" 
@@ -72,6 +74,19 @@ const Header: React.FC = () => {
                 <span className="hidden md:inline">プロフィール</span>
               </Link>
             </li>
+
+            {/* ログアウト */}
+            <li>
+              <Link 
+                href="/signout" 
+                className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
+                title="ログアウト"
+              >
+                <FaSignOutAlt className="text-xl" />
+                <span className="hidden md:inline">ログアウト</span>
+              </Link>
+            </li>
+
           </ul>
         </nav>
       </div>

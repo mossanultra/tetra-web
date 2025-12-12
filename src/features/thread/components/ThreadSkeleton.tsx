@@ -15,3 +15,4 @@ export const ThreadSkeleton: React.FC<{ count?: number }> = ({ count = 3 }) => (
     ))}
   </div>
 );
+

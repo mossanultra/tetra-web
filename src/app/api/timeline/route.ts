@@ -23,8 +23,6 @@ export async function GET() {
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
-    console.log("Timeline GET response:", response);
-
     const responseJson = await response.json();
     return NextResponse.json(responseJson);
   } catch (error) {

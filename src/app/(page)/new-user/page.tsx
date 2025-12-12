@@ -95,7 +95,7 @@ const NewUserPage = () => {
       setShowSuccess(true);
 
       setTimeout(() => {
-        window.location.href = "/home";
+        window.location.href = "/login-prompt";
       }, 3000);
     } catch (err) {
       console.error("エラー詳細:", err);
