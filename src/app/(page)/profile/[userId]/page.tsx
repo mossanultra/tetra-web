@@ -1,31 +1,29 @@
 "use client";
+
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { AlertMessage } from "@/src/features/user/components/AlertMessage";
 import { FormInput } from "@/src/features/user/components/FormInput";
 import { FormTextarea } from "@/src/features/user/components/FormTextarea";
 import { ProfileImageUpload } from "@/src/features/user/components/ProfileImageUpload";
 import { SuccessToast } from "@/src/features/user/components/SuccessToast";
 import { useImageUpload } from "@/src/features/user/hooks/useImageUpload";
-import { getAuthToken } from "@/src/services/actions";
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useProfile } from "@/src/features/user/hooks/useProfile";
 
-interface UserProfile {
-  profileId: string;
-  userName: string;
-  imageUrl: string;
-  introduction: string;
-}
-
-const ProfilePage = () => {
+const ProfilePage: React.FC = () => {
   const params = useParams();
-  const userId = params?.userId as string | undefined;
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const userId = (params as { userId?: string })?.userId;
+
+  // useProfile の戻り値名に合わせる
+  const {
+    data, // UserProfile | null
+    isFetching,
+    isOwnProfile,
+    error: profileError,
+    fetchProfile,
+    updateProfile,
+    setError,
+  } = useProfile(userId);
 
   const {
     imagePreview,
@@ -35,85 +33,39 @@ const ProfilePage = () => {
     getImageBase64,
   } = useImageUpload();
 
-  const [originalData, setOriginalData] = useState<UserProfile>({
-    profileId: "",
-    userName: "",
-    imageUrl: "",
-    introduction: "",
-  });
+  // ローカル UI state
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
+  // form のコントロール値（編集中に使う）
   const [userData, setUserData] = useState({
     nickname: "",
     bio: "",
   });
 
+  // プロフィール取得: 初回 & userId変更時
   useEffect(() => {
     fetchProfile();
-  }, [userId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]); // fetchProfile depends on userId internally; trigger when userId changes
 
-  const fetchProfile = async () => {
-    setIsFetching(true);
-    setError(null);
-
-    try {
-      const token = await getAuthToken();
-      if (!token) {
-        throw new Error("認証情報が見つかりません");
-      }
-
-      // userIdがない場合は自分自身のプロフィール、ある場合は指定されたユーザー
-      const endpoint = userId 
-        ? `/api/user/profile/${userId}`
-        : `/api/user/profile/@self`;
-
-      const response = await fetch(endpoint, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        throw new Error(`プロフィール取得に失敗しました (${response.status})`);
-      }
-
-      const data: UserProfile = await response.json();
-      
-      // 自分自身のプロフィールかどうかを判定
-      // userIdがないか、取得したprofileIdが自分のものと一致する場合
-      const selfResponse = await fetch(`/api/user/profile/@self`, {
-        method: "GET",
-      });
-      
-      if (selfResponse.ok) {
-        const selfData: UserProfile = await selfResponse.json();
-        setIsOwnProfile(!userId || data.profileId === selfData.profileId);
-      }
-      
-      setOriginalData(data);
+  // original data が入ったらフォーム初期化
+  useEffect(() => {
+    if (data) {
       setUserData({
         nickname: data.userName,
         bio: data.introduction,
       });
-
-      if (data.imageUrl) {
-        setInitialPreview(data.imageUrl);
-      }
-    } catch (err) {
-      console.error("プロフィール取得エラー:", err);
-      setError(
-        err instanceof Error ? err.message : "プロフィールの取得に失敗しました"
-      );
-    } finally {
-      setIsFetching(false);
+      if (data.imageUrl) setInitialPreview(data.imageUrl);
+      else setInitialPreview(null);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setUserData({
-      ...userData,
-      [name]: value,
-    });
+    setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleEdit = () => {
@@ -124,13 +76,15 @@ const ProfilePage = () => {
   const handleCancel = () => {
     setIsEditing(false);
     setError(null);
-    setUserData({
-      nickname: originalData.userName,
-      bio: originalData.introduction,
-    });
-    if (originalData.imageUrl) {
-      setInitialPreview(originalData.imageUrl);
+    if (data) {
+      setUserData({
+        nickname: data.userName,
+        bio: data.introduction,
+      });
+      if (data.imageUrl) setInitialPreview(data.imageUrl);
+      else setInitialPreview(null);
     } else {
+      setUserData({ nickname: "", bio: "" });
       setInitialPreview(null);
     }
   };
@@ -144,54 +98,34 @@ const ProfilePage = () => {
         throw new Error("ニックネームを入力してください");
       }
 
-      const token = await getAuthToken();
-      if (!token) {
-        throw new Error("認証情報が見つかりません。再度ログインしてください。");
-      }
-
+      // useImageUpload のユーティリティで Base64 を取得
       const imageBase64 = await getImageBase64();
 
-      const endpoint = `/api/user/profile`;
-
-      const response = await fetch(endpoint, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userName: userData.nickname,
-          imageBase64: imageBase64,
-          introduction: userData.bio,
-        }),
+      const success = await updateProfile({
+        nickname: userData.nickname,
+        bio: userData.bio,
+        imageBase64,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `エラーが発生しました (${response.status})`
-        );
+      if (!success) {
+        throw new Error("更新に失敗しました");
       }
 
-      const result = await response.json();
-      console.log("API レスポンス:", result);
-
+      // fetchProfile は updateProfile 内で呼ばれる想定ですが、万が一のため再取得
       await fetchProfile();
 
       setShowSuccess(true);
       setIsEditing(false);
-
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 3000);
+      setTimeout(() => setShowSuccess(false), 3000);
     } catch (err) {
-      console.error("エラー詳細:", err);
-      setError(
-        err instanceof Error ? err.message : "予期せぬエラーが発生しました"
-      );
+      setError(err instanceof Error ? err.message : "予期せぬエラーが発生しました");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // 表示中のエラーは hook の error を優先して表示
+  const displayError = profileError ?? null;
 
   if (isFetching) {
     return (
@@ -205,7 +139,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br ">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br">
       <div className="max-w-[480px] w-full bg-white rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.2)] overflow-hidden relative z-10">
         <div className="p-8 sm:p-6">
           <div className="text-center mb-8">
@@ -214,7 +148,7 @@ const ProfilePage = () => {
             </h2>
           </div>
 
-          {error && <AlertMessage message={error} type="error" />}
+          {displayError && <AlertMessage message={displayError} type="error" />}
 
           <div className="block">
             <div className="flex flex-col gap-5">
@@ -223,7 +157,7 @@ const ProfilePage = () => {
                 onImageChange={handleImageChange}
                 onImageRemove={handleImageRemove}
                 disabled={!isEditing}
-                onError={setError}
+                onError={(msg) => setError(msg)}
               />
 
               <FormInput
