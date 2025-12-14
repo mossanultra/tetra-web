@@ -8,6 +8,7 @@ import {
   FaSignOutAlt,
   FaMapMarkedAlt,
   FaStream,
+  FaHome,
 } from "react-icons/fa";
 import { useProfile } from "@/src/features/user/hooks/useProfile";
 
@@ -23,7 +24,10 @@ const Header: React.FC = () => {
   // 外側クリックで閉じる
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -34,7 +38,6 @@ const Header: React.FC = () => {
   return (
     <header className="text-white shadow-md relative">
       <div className="px-4 h-16 flex justify-between items-center">
-
         {/* ▼ 左：ユーザーアイコン */}
         <div className="flex items-center gap-3 relative" ref={popupRef}>
           <button
@@ -55,7 +58,6 @@ const Header: React.FC = () => {
           {/* ▼ プロフィールポップアップ */}
           {open && (
             <div className="absolute top-14 left-0 bg-white text-black rounded-xl shadow-xl w-72 py-3 z-50 border border-gray-200">
-
               {/* プロフィール概要 */}
               <div className="flex items-center gap-3 px-4 py-2">
                 <div className="w-12 h-12 rounded-full overflow-hidden border bg-gray-100 flex items-center justify-center">
@@ -70,8 +72,12 @@ const Header: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <p className="font-bold text-gray-900">{data?.userName ?? "未設定"}</p>
-                  <p className="text-sm text-gray-500">{data?.introduction ?? ""}</p>
+                  <p className="font-bold text-gray-900">
+                    {data?.userName ?? "未設定"}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {data?.introduction ?? ""}
+                  </p>
                 </div>
               </div>
 
@@ -79,7 +85,6 @@ const Header: React.FC = () => {
 
               {/* ▼ メニューリスト */}
               <div className="flex flex-col">
-
                 <Link
                   href="/profile/@self"
                   className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 transition-colors"
@@ -103,7 +108,6 @@ const Header: React.FC = () => {
                   <FaSignOutAlt className="text-gray-700" />
                   <span className="text-gray-800">サインアウト</span>
                 </Link>
-
               </div>
             </div>
           )}
@@ -120,6 +124,15 @@ const Header: React.FC = () => {
         {/* ▼ 右：ナビゲーション */}
         <nav className="flex items-center">
           <ul className="flex list-none m-0 p-0 gap-6 items-center">
+            <li>
+              <Link
+                href="/home"
+                className="text-white no-underline hover:text-blue-200 transition-colors duration-200 flex items-center gap-2"
+              >
+                <FaHome className="text-xl" />
+                <span className="hidden md:inline">ホーム</span>
+              </Link>
+            </li>
 
             <li>
               <Link
@@ -160,7 +173,6 @@ const Header: React.FC = () => {
                 <span className="hidden md:inline">ログアウト</span>
               </Link>
             </li>
-
           </ul>
         </nav>
       </div>

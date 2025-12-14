@@ -8,9 +8,9 @@ export const dynamic = "force-dynamic";
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 type PageProps = {
-  params: Promise<{
+  params: {
     threadId: string;
-  }>;
+  };
 };
 
 type ThreadResponse = {
@@ -20,7 +20,7 @@ type ThreadResponse = {
 };
 
 export default async function ThreadPage({ params }: PageProps) {
-  const { threadId } = await params;
+  const { threadId } = params;
 
   const session = await auth();
   if (!session?.idToken) {
@@ -38,10 +38,27 @@ export default async function ThreadPage({ params }: PageProps) {
     }
   );
 
-  if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
+  // =========================
+  // 404 は「存在しないが正常」
+  // =========================
+  if (res.status === 404) {
+    return (
+      <Suspense>
+        <ThreadClient initialThread={null} initialChildThreads={[]} />
+      </Suspense>
+    );
   }
 
+  // =========================
+  // その他のエラーは異常
+  // =========================
+  if (!res.ok) {
+    throw new Error(`Failed to fetch thread: ${res.status}`);
+  }
+
+  // =========================
+  // 正常系のみ JSON を読む
+  // =========================
   const data: {
     thread: Thread;
     childThreads: ThreadResponse[];

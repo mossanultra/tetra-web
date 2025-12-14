@@ -60,7 +60,7 @@ export default function ThreadClient({
           </div>
         )}
 
-        {loading && <ThreadSkeleton count={3} />}
+        {/* {loading && <ThreadSkeleton count={3} />} */}
 
         {!loading && thread && (
           <ThreadCard
@@ -73,7 +73,7 @@ export default function ThreadClient({
           />
         )}
 
-        {!loading && childThreads.length > 0 && (
+        {!loading && thread && childThreads.length > 0 && (
           <div className="divide-y divide-gray-200">
             {childThreads.map((child) => (
               <div key={child.threadId} className="pl-10">
