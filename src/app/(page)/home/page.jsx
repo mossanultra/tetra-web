@@ -58,16 +58,17 @@ const ThreadCard = ({ thread, index }) => {
 
       {/* カード本体 */}
       <div
-        className="bg-yellow-50 p-4 shadow-xl border border-gray-300"
+        className="bg-yellow-50 p-3 sm:p-4 shadow-xl border border-gray-300"
         style={{
           fontFamily: "'Nyashi Friends', cursive",
           boxShadow: '0 4px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2)',
-          minHeight: '180px',
-          maxWidth: '240px'
+          minHeight: '160px',
+          maxWidth: '100%',
+          width: '100%'
         }}
       >
         {/* スレッドタイトル */}
-        <h3 className="text-base font-bold mb-2 text-gray-800 break-words leading-tight">
+        <h3 className="text-sm sm:text-base font-bold mb-2 text-gray-800 break-words leading-tight">
           {thread.threadName}
         </h3>
 
@@ -77,7 +78,7 @@ const ThreadCard = ({ thread, index }) => {
             <img
               src={thread.imageUrl}
               alt={thread.threadName}
-              className="w-full h-20 object-cover border-2 border-white shadow-sm"
+              className="w-full h-16 sm:h-20 object-cover border-2 border-white shadow-sm"
             />
           </div>
         )}
@@ -87,7 +88,7 @@ const ThreadCard = ({ thread, index }) => {
           <img
             src={thread.ownerUserProfile.imageUrl}
             alt={thread.ownerUserProfile.userName}
-            className="w-6 h-6 rounded-full border border-gray-400 shadow"
+            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-gray-400 shadow"
           />
           <span className="text-xs text-gray-700 font-medium truncate">
             {thread.ownerUserProfile.userName}
@@ -97,9 +98,9 @@ const ThreadCard = ({ thread, index }) => {
         {/* 日付情報 */}
         <div className="text-xs text-gray-600 mt-2 pt-2 border-t border-gray-300">
           <div className="flex justify-between items-center">
-            <span>{formatDate(thread.createdAt)}</span>
+            {/* <span className="text-xs">{formatDate(thread.createdAt)}</span> */}
             {thread.selectDate && (
-              <span className="bg-orange-200 px-2 py-0.5 rounded text-xs">
+              <span className="bg-orange-200 px-1.5 sm:px-2 py-0.5 rounded text-xs">
                 📅 {formatDate(thread.selectDate)}
               </span>
             )}
@@ -107,11 +108,11 @@ const ThreadCard = ({ thread, index }) => {
         </div>
 
         {/* 子スレッド数 */}
-        {thread.childThreadCount > 0 && (
+        {/* {thread.childThreadCount > 0 && (
           <div className="absolute -bottom-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-md">
             {thread.childThreadCount}
           </div>
-        )}
+        )} */}
       </div>
 
       {/* 影（ピンで留められている感じ） */}
@@ -219,7 +220,7 @@ const SketchThreadList = () => {
 
   return (
     <div
-      className="min-h-screen p-8"
+      className="min-h-screen p-3 sm:p-6 md:p-8"
       style={{
         backgroundImage: 'url(/images/CorkBoard02.jpg)',
         backgroundSize: 'cover',
@@ -233,7 +234,7 @@ const SketchThreadList = () => {
 
       <div className="max-w-7xl mx-auto">
         <h1
-          className="text-4xl font-bold text-amber-900 mb-8 text-center p-4 bg-amber-100 border-4 border-amber-800 shadow-lg inline-block"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-900 mb-4 sm:mb-6 md:mb-8 text-center p-3 sm:p-4 bg-amber-100 border-3 sm:border-4 border-amber-800 shadow-lg inline-block"
           style={{
             fontFamily: "'Nyashi Friends', cursive",
             transform: 'rotate(-2deg)',
@@ -241,25 +242,16 @@ const SketchThreadList = () => {
             transform: 'translateX(-50%) rotate(-2deg)'
           }}
         >
-          📌 今月のイベント
+          今月のイベント
         </h1>
 
         {/* ピンがランダムに刺さっている感じのグリッド */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6 p-2 sm:p-4 md:p-8">
           {threadsData.threads.map((thread, index) => (
             <ThreadCard key={thread.threadId} thread={thread} index={index} />
           ))}
         </div>
       </div>
-
-      {/* コルクボードの質感を出すためのノイズ効果 */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-10"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
-          mixBlendMode: 'multiply'
-        }}
-      ></div>
     </div>
   );
 };
