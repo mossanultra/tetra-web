@@ -1,51 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ThreadDTO } from "../../thread/components/ThreadCard";
+import { ThreadDTO } from "@/src/features/thread/components/ThreadCard";
 
-const useTimeline = () => {
-  const [items, setItems] = useState<ThreadDTO[]>([]);
-  const [loading, setLoading] = useState(false);
+export const useTimeline = (initialItems: ThreadDTO[] = []) => {
+  const [items, setItems] = useState(initialItems);
+  const [loading, setLoading] = useState(!initialItems.length);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTimeline = async () => {
-    setLoading(true);
-    setError(null);
-
+  const refetch = async () => {
     try {
-      const res = await fetch("/api/timeline", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`データ取得に失敗しました (${res.status})`);
-      }
-
+      setLoading(true);
+      const res = await fetch("/api/timeline");
+      if (!res.ok) throw new Error();
       const data = await res.json();
-      setItems(data.threads ?? []);
-    } catch (err) {
-      console.error("[useTimeline]", err);
-      setError(
-        err instanceof Error ? err.message : "不明なエラーが発生しました"
-      );
+      setItems(data.threads);
+    } catch {
+      setError("タイムラインの取得に失敗しました");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTimeline();
+    if (!initialItems.length) refetch();
   }, []);
 
-  return {
-    items,
-    loading,
-    error,
-    refetch: fetchTimeline,
-  };
+  return { items, loading, error, refetch };
 };
-
-export { useTimeline };
