@@ -132,19 +132,19 @@ const SketchThreadList = () => {
     threads: [
       {
         threadId: "530da551-2a37-4f9f-9283-a0319c65eb2a",
-        threadName: "アドレス変更、パスワードリセット",
+        threadName: "焚火やるよー！！",
         createdAt: "2025-12-13T03:02:41.279Z",
         ownerUserId: "29aa36c3-675f-4db2-ba58-227165b49052",
         ownerUserProfile: {
           userId: "29aa36c3-675f-4db2-ba58-227165b49052",
-          userName: "ボスじゃないわんこ",
-          imageUrl: "https://tetra-images-poc.s3.amazonaws.com/profile/29aa36c3-675f-4db2-ba58-227165b49052.png"
+          userName: "まっほ",
+          imageUrl: "https://tetra-images-poc.s3.amazonaws.com/profile/5bda6b47-cc4b-466e-995c-d1a47b535eb1.png"
         },
         parentThreadId: null,
         childThreadIds: [],
         mapPointInfoId: "530da551-2a37-4f9f-9283-a0319c65eb2a",
-        imageUrl: null,
-        selectDate: null,
+        imageUrl: "https://msp.c.yimg.jp/images/v2/FUTi93tXq405grZVGgDqGx5cm8knTLo61O84kVTxOan841a30-aIJSoqkmlQNsP4-Qv0KVqX9M9vYFUiwJk7Tdr9p3hzprtPAh5HegABga5M5alO-vi3vxHm6eTgJV0UfMFVqNZ0DAhjvROKOit-jHFAMpUA3k0ETRfTqdyX2NokxQLp-CFgxld6sG2PGx8WIAkSvbq1_MTRxpkmKKCRyufQ7yBIuRuKh-3epcLKS2V-sdbuzxN4RY9bUJfTnpyt/Campfire_4213.jpg?errorImage=false",
+        selectDate: "2025-12-21T00:00:00.000Z",
         childThreadCount: 6
       },
       {
@@ -182,25 +182,8 @@ const SketchThreadList = () => {
         childThreadCount: 1
       },
       {
-        threadId: "cca7c24f-2558-4bb7-b558-8307a9d78986",
-        threadName: "北斗市追分",
-        createdAt: "2025-12-09T09:21:13.513Z",
-        ownerUserId: "6afa8165-89eb-4434-91e1-9cdac10ff57f",
-        ownerUserProfile: {
-          userId: "6afa8165-89eb-4434-91e1-9cdac10ff57f",
-          userName: "しんちゃろ",
-          imageUrl: "https://tetra-images-poc.s3.amazonaws.com/profile/6afa8165-89eb-4434-91e1-9cdac10ff57f.png"
-        },
-        parentThreadId: null,
-        childThreadIds: [],
-        mapPointInfoId: "c860cd2e-4708-410d-a059-7ce9d3945311",
-        imageUrl: null,
-        selectDate: "2025-12-25T00:00:00.000Z",
-        childThreadCount: 3
-      },
-      {
         threadId: "65cb8ac0-a98f-461b-83b1-7dcc97c30a8e",
-        threadName: "ハッシュタグほしい",
+        threadName: "合トレやっちゃう！？",
         createdAt: "2025-12-13T01:00:25.560Z",
         ownerUserId: "29aa36c3-675f-4db2-ba58-227165b49052",
         ownerUserProfile: {
