@@ -17,8 +17,10 @@ const CalendarTimelinePage = () => {
   const [threads, setThreads] = useState<ThreadDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(new Set());
-  
+  const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(
+    new Set()
+  );
+
   // モーダル関連
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [replyTarget, setReplyTarget] = useState<ThreadDTO | null>(null);
@@ -46,8 +48,8 @@ const CalendarTimelinePage = () => {
         endDate = dateRange;
       }
 
-      const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
+      const startDateStr = startDate.toISOString().split("T")[0];
+      const endDateStr = endDate.toISOString().split("T")[0];
 
       const res = await fetch(
         `/api/timeline/query?startDate=${startDateStr}&endDate=${endDateStr}&limit=20`,
@@ -67,7 +69,9 @@ const CalendarTimelinePage = () => {
       setThreads(data.threads || []);
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "不明なエラーが発生しました");
+      setError(
+        err instanceof Error ? err.message : "不明なエラーが発生しました"
+      );
     } finally {
       setLoading(false);
     }
@@ -86,7 +90,9 @@ const CalendarTimelinePage = () => {
       const start = dateRange[0];
       const end = dateRange[1];
       if (start && end) {
-        return `${start.toLocaleDateString("ja-JP")} 〜 ${end.toLocaleDateString("ja-JP")}`;
+        return `${start.toLocaleDateString(
+          "ja-JP"
+        )} 〜 ${end.toLocaleDateString("ja-JP")}`;
       } else if (start) {
         return start.toLocaleDateString("ja-JP");
       }
@@ -137,7 +143,7 @@ const CalendarTimelinePage = () => {
   };
 
   const toggleBookmark = (threadId: string) => {
-    setBookmarkedThreads(prev => {
+    setBookmarkedThreads((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(threadId)) {
         newSet.delete(threadId);
@@ -168,7 +174,9 @@ const CalendarTimelinePage = () => {
             {/* 選択期間表示 */}
             {dateRange && (
               <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="text-sm text-blue-700 font-medium mb-1">選択期間</div>
+                <div className="text-sm text-blue-700 font-medium mb-1">
+                  選択期間
+                </div>
                 <div className="text-gray-900">{getSelectedDateRange()}</div>
                 <button
                   onClick={resetSelection}

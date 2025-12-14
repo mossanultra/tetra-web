@@ -26,7 +26,11 @@ export interface ThreadDTO {
 
 interface ThreadResponse {
   thread: ThreadDTO;
-  childThreads: { thread: ThreadDTO; childThreads: []; parentThread: ThreadDTO }[];
+  childThreads: {
+    thread: ThreadDTO;
+    childThreads: [];
+    parentThread: ThreadDTO;
+  }[];
   parentThread: ThreadDTO | null;
 }
 
@@ -38,7 +42,9 @@ export default function ThreadPage() {
   const [childThreads, setChildThreads] = useState<ThreadDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(new Set());
+  const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(
+    new Set()
+  );
 
   // --- モーダル関連 ---
   const [replyModalOpen, setReplyModalOpen] = useState(false);
@@ -118,7 +124,6 @@ export default function ThreadPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-2xl mx-auto border-x border-gray-200 min-h-screen overflow-y-auto">
-
         {/* --- エラー --- */}
         {error && (
           <div className="m-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">

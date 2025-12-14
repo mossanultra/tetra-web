@@ -63,7 +63,9 @@ const ProfilePage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
@@ -118,7 +120,9 @@ const ProfilePage: React.FC = () => {
       setIsEditing(false);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "予期せぬエラーが発生しました");
+      setError(
+        err instanceof Error ? err.message : "予期せぬエラーが発生しました"
+      );
     } finally {
       setIsLoading(false);
     }

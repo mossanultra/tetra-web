@@ -35,7 +35,9 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
+  const [imagePreview, setImagePreview] = useState<string | undefined>(
+    undefined
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen || !pendingPin) return null;
@@ -118,8 +120,15 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
         }}
       >
         <h3 style={{ margin: "0 0 16px 0" }}>新しいピン</h3>
-        
-        <label style={{ fontSize: 12, color: "#555", display: "block", marginBottom: 4 }}>
+
+        <label
+          style={{
+            fontSize: 12,
+            color: "#555",
+            display: "block",
+            marginBottom: 4,
+          }}
+        >
           スレッド名
         </label>
         <input
@@ -136,8 +145,15 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
             color: "#333",
           }}
         />
-        
-        <label style={{ fontSize: 12, color: "#555", display: "block", marginBottom: 4 }}>
+
+        <label
+          style={{
+            fontSize: 12,
+            color: "#555",
+            display: "block",
+            marginBottom: 4,
+          }}
+        >
           カテゴリ
         </label>
         <select
@@ -160,7 +176,14 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
           ))}
         </select>
 
-        <label style={{ fontSize: 12, color: "#555", display: "block", marginBottom: 4 }}>
+        <label
+          style={{
+            fontSize: 12,
+            color: "#555",
+            display: "block",
+            marginBottom: 4,
+          }}
+        >
           日付
         </label>
         <div style={{ position: "relative", marginBottom: 12 }}>
@@ -191,7 +214,14 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
           />
         </div>
 
-        <label style={{ fontSize: 12, color: "#555", display: "block", marginBottom: 4 }}>
+        <label
+          style={{
+            fontSize: 12,
+            color: "#555",
+            display: "block",
+            marginBottom: 4,
+          }}
+        >
           画像
         </label>
         <div style={{ marginBottom: 12 }}>

@@ -1,6 +1,12 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { FaRegComment, FaRegBookmark, FaBookmark, FaTimes, FaImage } from "react-icons/fa";
+import {
+  FaRegComment,
+  FaRegBookmark,
+  FaBookmark,
+  FaTimes,
+  FaImage,
+} from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 // getAuthToken は元のファイルからインポート
@@ -30,8 +36,10 @@ const TimelinePage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openImage, setOpenImage] = useState<string | null>(null);
-  const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(new Set());
-  
+  const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(
+    new Set()
+  );
+
   // 返信モーダル関連
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [replyTarget, setReplyTarget] = useState<ThreadDTO | null>(null);
@@ -69,7 +77,9 @@ const TimelinePage = () => {
       setItems(data.threads);
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "不明なエラーが発生しました");
+      setError(
+        err instanceof Error ? err.message : "不明なエラーが発生しました"
+      );
     } finally {
       setLoading(false);
     }
@@ -84,16 +94,16 @@ const TimelinePage = () => {
     if (diff < 3600) return `${Math.floor(diff / 60)}分前`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}時間前`;
     if (diff < 86400 * 7) return `${Math.floor(diff / 86400)}日前`;
-    
+
     return d.toLocaleDateString("ja-JP", { month: "short", day: "numeric" });
   };
 
   const formatSelectDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("ja-JP", { 
-      year: "numeric", 
-      month: "long", 
-      day: "numeric" 
+    return d.toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -173,7 +183,7 @@ const TimelinePage = () => {
   };
 
   const toggleBookmark = (threadId: string) => {
-    setBookmarkedThreads(prev => {
+    setBookmarkedThreads((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(threadId)) {
         newSet.delete(threadId);
@@ -382,7 +392,9 @@ const TimelinePage = () => {
             <div className="p-4 border-b border-gray-200">
               <div className="flex gap-3">
                 <img
-                  src={replyTarget.ownerUserProfile.imageUrl ?? "/default-user.png"}
+                  src={
+                    replyTarget.ownerUserProfile.imageUrl ?? "/default-user.png"
+                  }
                   alt={replyTarget.ownerUserProfile.userName}
                   className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                 />
@@ -408,7 +420,10 @@ const TimelinePage = () => {
                 </div>
               </div>
               <div className="ml-[52px] mt-2 text-sm text-gray-500">
-                返信先: <span className="text-blue-500">@{replyTarget.ownerUserProfile.userName}</span>
+                返信先:{" "}
+                <span className="text-blue-500">
+                  @{replyTarget.ownerUserProfile.userName}
+                </span>
               </div>
             </div>
 

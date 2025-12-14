@@ -14,12 +14,8 @@ const NewUserPage = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const {
-    imagePreview,
-    handleImageChange,
-    handleImageRemove,
-    getImageBase64,
-  } = useImageUpload();
+  const { imagePreview, handleImageChange, handleImageRemove, getImageBase64 } =
+    useImageUpload();
 
   const [userData, setUserData] = useState({
     nickname: "",
@@ -89,11 +85,7 @@ const NewUserPage = () => {
         );
       }
 
-      const result = await response.json();
-      console.log("API レスポンス:", result);
-
       setShowSuccess(true);
-
       setTimeout(() => {
         window.location.href = "/login-prompt";
       }, 3000);
