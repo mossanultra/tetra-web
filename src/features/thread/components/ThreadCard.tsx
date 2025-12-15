@@ -144,6 +144,17 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
               />
             </div>
           )}
+          {/* 📍 アドレス表示 */}
+          {thread.address && (
+            <div
+              className={`flex items-center gap-1 mb-2 text-gray-500 ${
+                isCompact ? "text-xs" : "text-sm"
+              }`}
+            >
+              <span>📍</span>
+              <span className="truncate">{thread.address}</span>
+            </div>
+          )}
 
           {/* アクションボタン */}
           {showActions && (

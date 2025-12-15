@@ -222,6 +222,15 @@ export default function TimelineClient({ initialItems }: Props) {
                       />
                     </div>
                   )}
+                  {/* 📍 アドレス表示 */}
+                  {t.address && (
+                    <div
+                      className={`flex items-center gap-1 mb-2 text-gray-500 ${"text-xs"}`}
+                    >
+                      <span>📍</span>
+                      <span className="truncate">{t.address}</span>
+                    </div>
+                  )}
 
                   {/* アクションボタン */}
                   <div className="flex items-center gap-6 mt-3 text-gray-500">

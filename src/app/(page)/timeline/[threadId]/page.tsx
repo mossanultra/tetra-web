@@ -1,3 +1,4 @@
+// src/app/%28page%29/timeline/[threadId]/page.tsx
 import { Suspense } from "react";
 import { auth } from "@/src/services/auth";
 import ThreadClient from "@/src/features/thread/components/ThreadClient";
@@ -20,12 +21,14 @@ type ThreadResponse = {
 };
 
 export default async function ThreadPage({ params }: PageProps) {
-  const { threadId } = params;
+  const { threadId } = await params;
 
   const session = await auth();
   if (!session?.idToken) {
     throw new Error("Unauthorized");
   }
+
+  console.log("Fetching thread:", threadId);
 
   const res = await fetch(
     `${apiBaseUrl}/timeline/thread?threadId=${threadId}`,

@@ -14,4 +14,5 @@ export interface Thread {
   imageUrl: string | null;
   selectDate: string | null;
   childThreadCount: number;
+  address: string | null;
 }
