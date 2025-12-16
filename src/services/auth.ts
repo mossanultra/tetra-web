@@ -9,7 +9,11 @@ const cognitoClientSecret = process.env.COGNITO_CLIENT_SECRET || ""; // 追加: 
 // リフレッシュトークンを使って新しいアクセストークンとIDトークンを取得する関数
 async function refreshTokens(
   token: JWT
-): Promise<{ accessToken: string; idToken: string; refreshToken?: string } | null> {
+): Promise<{
+  accessToken: string;
+  idToken: string;
+  refreshToken?: string;
+} | null> {
   console.log("Refreshing tokens...");
   if (!token.refreshToken) {
     console.error("No refresh token available");
@@ -116,7 +120,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         params: {
           scope: "openid email",
         },
-    },
+      },
     }),
   ],
   callbacks: {

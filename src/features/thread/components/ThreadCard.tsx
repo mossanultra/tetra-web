@@ -1,6 +1,12 @@
 // components/thread/ThreadCard.tsx
 "use client";
-import { FaRegComment, FaRegBookmark, FaBookmark } from "react-icons/fa";
+import { useState, useRef, useEffect } from "react";
+import {
+  FaRegComment,
+  FaRegBookmark,
+  FaBookmark,
+  FaEllipsisH,
+} from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { Thread } from "../types/Thread";
 
@@ -13,6 +19,9 @@ interface ThreadCardProps {
   isCompact?: boolean;
   isChild?: boolean;
   showActions?: boolean;
+  onDelete: (threadId: string) => void;
+  onReport: (threadId: string) => void;
+  currentUserId: string | null; // 現在のユーザーID
 }
 
 export const formatDate = (iso: string) => {
@@ -46,8 +55,33 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
   isCompact = false,
   isChild = false,
   showActions = true,
+  onDelete,
+  onReport,
+  currentUserId,
 }) => {
   const router = useRouter();
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const isOwnThread = currentUserId === thread.ownerUserId;
+  console.log("ThreadCard render:", { isOwnThread });
+
+  // メニュー外クリックで閉じる
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMenu]);
 
   const navigateToProfile = (userId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -73,6 +107,25 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
     onImageClick?.(thread.imageUrl!);
   };
 
+  const handleMenuToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMenu(!showMenu);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMenu(false);
+    if (window.confirm("この投稿を削除しますか?")) {
+      onDelete?.(thread.threadId);
+    }
+  };
+
+  const handleReport = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMenu(false);
+    onReport?.(thread.threadId);
+  };
+
   const avatarSize = isCompact ? "w-10 h-10" : "w-12 h-12";
   const textSize = isCompact ? "text-sm" : "text-[15px]";
   const nameSize = isCompact ? "text-sm" : "";
@@ -80,7 +133,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
   return (
     <article
       onClick={navigateToThread}
-      className={`px-4 py-3 hover:bg-gray-50 transition cursor-pointer ${
+      className={`relative px-4 py-3 hover:bg-gray-50 transition cursor-pointer ${
         isChild ? "ml-10 border-l border-gray-300" : ""
       }`}
     >
@@ -95,19 +148,50 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
 
         {/* コンテンツ */}
         <div className="flex-1 min-w-0">
-          {/* ユーザー情報 */}
-          <div className="flex items-center gap-2 mb-1">
-            <span
-              onClick={(e) => navigateToProfile(thread.ownerUserId, e)}
-              className={`font-bold text-gray-900 hover:underline cursor-pointer ${nameSize}`}
-            >
-              {thread.ownerUserProfile.userName}
-            </span>
-            <span
-              className={`text-gray-500 ${isCompact ? "text-xs" : "text-sm"}`}
-            >
-              · {formatDate(thread.createdAt)}
-            </span>
+          {/* ユーザー情報と三点リーダー */}
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <span
+                onClick={(e) => navigateToProfile(thread.ownerUserId, e)}
+                className={`font-bold text-gray-900 hover:underline cursor-pointer ${nameSize}`}
+              >
+                {thread.ownerUserProfile.userName}
+              </span>
+              <span
+                className={`text-gray-500 ${isCompact ? "text-xs" : "text-sm"}`}
+              >
+                · {formatDate(thread.createdAt)}
+              </span>
+            </div>
+
+            {/* 三点リーダーメニュー */}
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={handleMenuToggle}
+                className="p-2 rounded-full hover:bg-gray-200 transition text-gray-500 hover:text-gray-700"
+              >
+                <FaEllipsisH className="w-4 h-4" />
+              </button>
+
+              {showMenu && (
+                <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                  {isOwnThread && (
+                    <button
+                      onClick={handleDelete}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition"
+                    >
+                      削除
+                    </button>
+                  )}
+                  <button
+                    onClick={handleReport}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition"
+                  >
+                    通報
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 本文 */}
@@ -174,7 +258,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
                 </button>
               )}
 
-              {/* リプライ数のみ表示（ボタンなし） */}
+              {/* リプライ数のみ表示(ボタンなし) */}
               {!onReply && thread.childThreadCount > 0 && (
                 <div className="flex items-center gap-2 text-gray-500">
                   <div className="p-2">

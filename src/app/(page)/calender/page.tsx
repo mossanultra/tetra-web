@@ -340,6 +340,13 @@ const CalendarTimelinePage = () => {
                     isBookmarked={bookmarkedThreads.has(thread.threadId)}
                     onToggleBookmark={toggleBookmark}
                     isCompact={true}
+                    currentUserId={null}
+                    onDelete={() => {
+                      console.log("delete");
+                    }}
+                    onReport={() => {
+                      console.log("Reported thread:", thread.threadId);
+                    }}
                   />
                 ))}
               </div>

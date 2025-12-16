@@ -28,8 +28,6 @@ export default async function ThreadPage({ params }: PageProps) {
     throw new Error("Unauthorized");
   }
 
-  console.log("Fetching thread:", threadId);
-
   const res = await fetch(
     `${apiBaseUrl}/timeline/thread?threadId=${threadId}`,
     {
@@ -47,7 +45,11 @@ export default async function ThreadPage({ params }: PageProps) {
   if (res.status === 404) {
     return (
       <Suspense>
-        <ThreadClient initialThread={null} initialChildThreads={[]} />
+        <ThreadClient
+          initialThread={null}
+          initialChildThreads={[]}
+          ownUserId={null}
+        />
       </Suspense>
     );
   }
@@ -58,6 +60,13 @@ export default async function ThreadPage({ params }: PageProps) {
   if (!res.ok) {
     throw new Error(`Failed to fetch thread: ${res.status}`);
   }
+  const userResponse = await fetch(`${apiBaseUrl}/user`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: session.idToken,
+    },
+    cache: "no-store",
+  });
 
   // =========================
   // 正常系のみ JSON を読む
@@ -66,6 +75,9 @@ export default async function ThreadPage({ params }: PageProps) {
     thread: Thread;
     childThreads: ThreadResponse[];
   } = await res.json();
+
+  const user = await userResponse.json();
+  console.log("User Info:", user);
 
   const normalizedChildThreads: Thread[] = data.childThreads.map(
     (item) => item.thread
@@ -76,6 +88,7 @@ export default async function ThreadPage({ params }: PageProps) {
       <ThreadClient
         initialThread={data.thread}
         initialChildThreads={normalizedChildThreads}
+        ownUserId={user.userId}
       />
     </Suspense>
   );

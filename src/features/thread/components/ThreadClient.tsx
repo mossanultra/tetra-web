@@ -11,11 +11,13 @@ import { Thread } from "../types/Thread";
 type Props = {
   initialThread: Thread | null;
   initialChildThreads: Thread[];
+  ownUserId: string | null;
 };
 
 export default function ThreadClient({
   initialThread,
   initialChildThreads,
+  ownUserId,
 }: Props) {
   const { thread, childThreads, loading, error, submitReply } = useThread(
     initialThread,
@@ -70,6 +72,13 @@ export default function ThreadClient({
             isBookmarked={bookmarkedThreads.has(thread.threadId)}
             onToggleBookmark={toggleBookmark}
             isCompact={false}
+            currentUserId={ownUserId}
+            onDelete={() => {
+              console.log("delete");
+            }}
+            onReport={() => {
+              console.log("Reported thread:", thread.threadId);
+            }}
           />
         )}
 
@@ -84,6 +93,13 @@ export default function ThreadClient({
                   isBookmarked={bookmarkedThreads.has(child.threadId)}
                   onToggleBookmark={toggleBookmark}
                   isCompact
+                  currentUserId={ownUserId}
+                  onDelete={() => {
+                    console.log("delete");
+                  }}
+                  onReport={() => {
+                    console.log("Reported thread:", child.threadId);
+                  }}
                 />
               </div>
             ))}
