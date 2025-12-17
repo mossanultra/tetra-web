@@ -16,6 +16,7 @@ const CalendarTimelinePage = () => {
   const [dateRange, setDateRange] = useState<Value>(null);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(false);
+  const [userId, serUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(
     new Set()
@@ -33,7 +34,6 @@ const CalendarTimelinePage = () => {
   const fetchThreads = async () => {
     if (!dateRange) return;
 
-    setLoading(true);
     setError(null);
 
     try {
@@ -73,14 +73,39 @@ const CalendarTimelinePage = () => {
         err instanceof Error ? err.message : "不明なエラーが発生しました"
       );
     } finally {
-      setLoading(false);
+    }
+  };
+  const fetchUserId = async () => {
+    try {
+      const res = await fetch(`/api/user`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`データ取得に失敗しました (${res.status})`);
+      }
+
+      const data = await res.json();
+      serUserId(data.userId || null);
+    } catch (err) {
+      console.error(err);
+      setError(
+        err instanceof Error ? err.message : "不明なエラーが発生しました"
+      );
+    } finally {
     }
   };
 
   useEffect(() => {
+    setLoading(true);
+    fetchUserId();
     if (dateRange) {
       fetchThreads();
     }
+    setLoading(false);
   }, [dateRange]);
 
   const getSelectedDateRange = () => {
@@ -340,7 +365,7 @@ const CalendarTimelinePage = () => {
                     isBookmarked={bookmarkedThreads.has(thread.threadId)}
                     onToggleBookmark={toggleBookmark}
                     isCompact={true}
-                    currentUserId={null}
+                    currentUserId={userId}
                     onDelete={() => {
                       console.log("delete");
                     }}
