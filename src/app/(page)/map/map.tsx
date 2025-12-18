@@ -96,20 +96,41 @@ const usePinCreation = (setPoints: (p: Point[]) => void) => {
     setCategory("雑談");
     setPinModalOpen(true);
   };
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          reject(new Error("Failed to convert file to base64"));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   const confirmPlacePin = async (date: Date | null, image: File | null) => {
     if (!pendingPin) return;
 
     setSavingPin(true);
     try {
+      let imageBase64: string | null = null;
+
+      if (image) {
+        imageBase64 = await fileToBase64(image);
+      }
+
       await registerPoint(
         pendingPin.lat,
         pendingPin.lng,
         date,
-        null,
+        imageBase64, // ← ここにBase64を渡す
         threadName,
         category
       );
+
       setPoints(await fetchPoints());
       setPinModalOpen(false);
       setPendingPin(null);
