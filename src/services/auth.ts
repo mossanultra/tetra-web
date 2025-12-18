@@ -7,14 +7,11 @@ const cognitoClientId = process.env.COGNITO_CLIENT_ID || "";
 const cognitoClientSecret = process.env.COGNITO_CLIENT_SECRET || ""; // 追加: client_secretが必要な場合
 
 // リフレッシュトークンを使って新しいアクセストークンとIDトークンを取得する関数
-async function refreshTokens(
-  token: JWT
-): Promise<{
+async function refreshTokens(token: JWT): Promise<{
   accessToken: string;
   idToken: string;
   refreshToken?: string;
 } | null> {
-  console.log("Refreshing tokens...");
   if (!token.refreshToken) {
     console.error("No refresh token available");
     return null;

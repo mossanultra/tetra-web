@@ -8,9 +8,8 @@ export async function registerPoint(
   selectedDate: Date | null,
   imageBase64: string | null,
   threadName: string,
-  category: string,
+  category: string
 ): Promise<boolean> {
-  console.log("Registering point with:", { lat, lng, threadName, category });
   if (!lat || !lng) {
     console.warn("緯度経度を入れてください。");
     return false;

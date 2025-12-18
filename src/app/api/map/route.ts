@@ -29,10 +29,7 @@ export async function GET() {
     return NextResponse.json(responseJson);
   } catch (error) {
     console.error("map API error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch map" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch map" }, { status: 500 });
   }
 }
 
@@ -50,7 +47,6 @@ export async function POST(request: NextRequest) {
     const category = formData.get("category");
     const selectedDate = getFormValue(formData.get("selectedDate"));
     const imageBase64 = getFormValue(formData.get("imageBase64"));
-    console.log("Received map POST data:", { lat, lng, threadName, category, selectedDate });
     const response = await fetch(`${apiBaseUrl}/map`, {
       method: "POST",
       headers: {
@@ -63,7 +59,7 @@ export async function POST(request: NextRequest) {
         threadName,
         category,
         selectedDate,
-        imageBase64
+        imageBase64,
       }),
     });
 
@@ -74,9 +70,6 @@ export async function POST(request: NextRequest) {
     const createdExercise = await response.json();
     return NextResponse.json(createdExercise);
   } catch (error) {
-    return NextResponse.json(
-      { error: error },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }

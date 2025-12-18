@@ -11,21 +11,22 @@ export async function GET(
   try {
     const session = await auth();
     const { threadId } = await params;
-    console.log("threadId:", threadId);
-
     if (!session?.idToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // バックエンドAPIへの呼び出し
-    const response = await fetch(`${apiBaseUrl}/timeline/thread?threadId=${threadId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${session.idToken}`,
-      },
-    });
-    if(response.status === 404) {
+    const response = await fetch(
+      `${apiBaseUrl}/timeline/thread?threadId=${threadId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${session.idToken}`,
+        },
+      }
+    );
+    if (response.status === 404) {
       return NextResponse.json({ error: "Thread not found" }, { status: 404 });
     }
     if (!response.ok) {
@@ -42,6 +43,7 @@ export async function GET(
     );
   }
 }
+
 // export async function POST(request: NextRequest) {
 //   try {
 //     const session = await auth();

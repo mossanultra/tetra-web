@@ -17,7 +17,6 @@ export const useThread = (
     threadName: string,
     imageBase64: string | null
   ) => {
-    console.log("Submitting reply to thread:", parentThreadId);
     try {
       const res = await fetch("/api/timeline/thread", {
         method: "POST",
@@ -28,10 +27,29 @@ export const useThread = (
       if (!res.ok) throw new Error("failed");
 
       const newThread = await res.json();
-      console.log("Reply created:", newThread);
       setChildThreads((prev) => [newThread, ...prev]);
     } catch {
       setError("返信に失敗しました");
+    }
+  };
+
+  const deleteThread = async (threadId: string) => {
+    console.log("Deleting thread with ID:", threadId);
+    try {
+      const res = await fetch(`/api/timeline/thread?threadId=${threadId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("failed");
+
+      setChildThreads((prev) => prev.filter((t) => t.threadId !== threadId));
+
+      // メインスレッドが削除された場合
+      if (thread?.threadId === threadId) {
+        setThread(null);
+      }
+    } catch {
+      setError("削除に失敗しました");
     }
   };
 
@@ -41,5 +59,6 @@ export const useThread = (
     loading,
     error,
     submitReply,
+    deleteThread,
   };
 };

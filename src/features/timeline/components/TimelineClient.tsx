@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { ThreadCard } from "@/src/features/thread/components/ThreadCard";
 import { ReplyModal } from "@/src/features/thread/components/ReplyModal";
 import { ImageModal } from "@/src/features/thread/components/ImageModal";
@@ -14,7 +13,6 @@ type Props = {
 };
 
 export default function TimelineClient({ initialItems, ownUserId }: Props) {
-  const router = useRouter();
   const { items, loading, error, refetch } = useTimeline(initialItems);
   const [openImage, setOpenImage] = useState<string | null>(null);
   const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(
@@ -74,13 +72,10 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
     });
   };
 
-  const handleThreadClick = (threadId: string) => {
-    router.push(`/timeline/${threadId}`);
-  };
-
-  const handleDelete = (threadId: string) => {
-    console.log("Delete thread:", threadId);
-    // 削除処理の実装
+  const handleDeleted = async (threadId: string) => {
+    console.log("Thread deleted:", threadId);
+    // 削除完了後にタイムラインをリフレッシュ
+    await refetch();
   };
 
   const handleReport = (threadId: string) => {
@@ -117,7 +112,7 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
               onToggleBookmark={toggleBookmark}
               isCompact={false}
               currentUserId={ownUserId}
-              onDelete={() => handleDelete(thread.threadId)}
+              onDeleted={handleDeleted}
               onReport={() => handleReport(thread.threadId)}
             />
           ))}

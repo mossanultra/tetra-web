@@ -77,7 +77,6 @@ export default async function ThreadPage({ params }: PageProps) {
   } = await res.json();
 
   const user = await userResponse.json();
-  console.log("User Info:", user);
 
   const normalizedChildThreads: Thread[] = data.childThreads.map(
     (item) => item.thread

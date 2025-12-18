@@ -130,8 +130,6 @@ export const MarkerContent: React.FC<{
 }> = ({ point, onClick }) => {
   const { id, category = "雑談", threadName, imageUrl, selectDate } = point;
 
-  console.log("MarkerContent point:", point);
-
   const style = CATEGORY_STYLE[category] ?? CATEGORY_STYLE["雑談"];
 
   return (

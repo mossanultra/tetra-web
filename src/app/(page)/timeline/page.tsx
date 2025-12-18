@@ -21,7 +21,6 @@ export default async function TimelinePage() {
   const initialItems = await fetchTimeline({
     idToken: session.idToken,
   });
-  console.log("初期タイムラインアイテム:", initialItems[0]);
 
   return (
     <Suspense>

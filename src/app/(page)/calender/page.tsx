@@ -366,7 +366,7 @@ const CalendarTimelinePage = () => {
                     onToggleBookmark={toggleBookmark}
                     isCompact={true}
                     currentUserId={userId}
-                    onDelete={() => {
+                    onDeleted={() => {
                       console.log("delete");
                     }}
                     onReport={() => {

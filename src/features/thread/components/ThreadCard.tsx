@@ -19,7 +19,7 @@ interface ThreadCardProps {
   isCompact?: boolean;
   isChild?: boolean;
   showActions?: boolean;
-  onDelete: (threadId: string) => void;
+  onDeleted?: (threadId: string) => void; // 削除完了通知用
   onReport: (threadId: string) => void;
   currentUserId: string | null; // 現在のユーザーID
 }
@@ -55,17 +55,16 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
   isCompact = false,
   isChild = false,
   showActions = true,
-  onDelete,
+  onDeleted,
   onReport,
   currentUserId,
 }) => {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isOwnThread = currentUserId === thread.ownerUserId;
-  console.log("ThreadCard render:", { isOwnThread });
-
   // メニュー外クリックで閉じる
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -112,11 +111,35 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
     setShowMenu(!showMenu);
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu(false);
-    if (window.confirm("この投稿を削除しますか?")) {
-      onDelete?.(thread.threadId);
+
+    if (!window.confirm("この投稿を削除しますか?")) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      const res = await fetch(
+        `/api/timeline/thread?threadId=${thread.threadId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("削除に失敗しました");
+      }
+
+      // 親コンポーネントに削除完了を通知
+      onDeleted?.(thread.threadId);
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("削除に失敗しました。もう一度お試しください。");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -130,12 +153,15 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
   const textSize = isCompact ? "text-sm" : "text-[15px]";
   const nameSize = isCompact ? "text-sm" : "";
 
+  // 削除中の場合は透明度を下げる
+  const cardOpacity = isDeleting ? "opacity-50 pointer-events-none" : "";
+
   return (
     <article
       onClick={navigateToThread}
       className={`relative px-4 py-3 hover:bg-gray-50 transition cursor-pointer ${
         isChild ? "ml-10 border-l border-gray-300" : ""
-      }`}
+      } ${cardOpacity}`}
     >
       <div className="flex gap-3">
         {/* アイコン */}
@@ -168,7 +194,8 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
             <div className="relative" ref={menuRef}>
               <button
                 onClick={handleMenuToggle}
-                className="p-2 rounded-full hover:bg-gray-200 transition text-gray-500 hover:text-gray-700"
+                disabled={isDeleting}
+                className="p-2 rounded-full hover:bg-gray-200 transition text-gray-500 hover:text-gray-700 disabled:opacity-50"
               >
                 <FaEllipsisH className="w-4 h-4" />
               </button>
@@ -178,9 +205,10 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
                   {isOwnThread && (
                     <button
                       onClick={handleDelete}
-                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition"
+                      disabled={isDeleting}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition disabled:opacity-50"
                     >
-                      削除
+                      {isDeleting ? "削除中..." : "削除"}
                     </button>
                   )}
                   <button
