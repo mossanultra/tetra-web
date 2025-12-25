@@ -115,7 +115,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       clientSecret: cognitoClientSecret,
       authorization: {
         params: {
-          scope: "openid email",
+          scope: "openid email offline_access",
         },
       },
     }),
@@ -204,7 +204,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         const newTokens = await refreshTokens(token);
 
         if (newTokens) {
-          // console.log("Token refreshed successfully");
+          console.log("Token refreshed successfully");
           // 新しいトークンでJWTを更新
           return {
             ...token,
