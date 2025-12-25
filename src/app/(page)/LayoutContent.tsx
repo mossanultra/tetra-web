@@ -1,25 +1,29 @@
+"use client";
+
 import Footer from "@/src/components/layouts/Footer/footer";
 import Header from "@/src/components/layouts/Header/header";
 import SidebarNavigation from "@/src/components/layouts/Sidebar/Sidebar";
 import SidebarContent from "@/src/components/layouts/Sidebar/SidebarContent";
-import React from "react";
+import React, { useState } from "react";
 
 interface LayoutContentProps {
   children: React.ReactNode;
 }
 
 const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <Header />
+      <Header onMenuClick={() => setSidebarOpen(true)} />
 
       {/* Body（残り高さを固定） */}
       <div className="flex flex-1 min-h-0">
         {/* Sidebar（スクロールしない） */}
-        <aside className="w-12 shrink-0">
-          <SidebarNavigation />
-        </aside>
+        <SidebarNavigation
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
         {/* Main（ここだけスクロール） */}
         <main className="flex-1 overflow-y-auto">{children}</main>
