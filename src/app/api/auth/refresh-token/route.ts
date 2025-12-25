@@ -33,7 +33,7 @@ async function refreshAccessToken({
   );
 
   const params: InitiateAuthCommandInput = {
-    AuthFlow: "REFRESH_TOKEN",
+    AuthFlow: "REFRESH_TOKEN_AUTH",
     ClientId: process.env.COGNITO_CLIENT_ID!,
     AuthParameters: {
       REFRESH_TOKEN: refreshToken,
