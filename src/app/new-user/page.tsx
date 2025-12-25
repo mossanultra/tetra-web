@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getAuthToken } from "../../../services/actions";
+import { getAuthToken } from "../../services/actions";
 import { AlertMessage } from "@/src/features/user/components/AlertMessage";
 import { FormInput } from "@/src/features/user/components/FormInput";
 import { FormTextarea } from "@/src/features/user/components/FormTextarea";
