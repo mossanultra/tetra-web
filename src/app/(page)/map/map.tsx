@@ -44,7 +44,7 @@ const DEFAULT_CENTER = {
 
 const MAP_CONTAINER_STYLE: React.CSSProperties = {
   width: "100%",
-  height: "600px",
+  height: "100%",
 };
 
 const USER_MARKER_SIZE = 40;

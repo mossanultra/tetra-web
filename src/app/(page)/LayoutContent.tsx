@@ -1,5 +1,7 @@
 import Footer from "@/src/components/layouts/Footer/footer";
 import Header from "@/src/components/layouts/Header/header";
+import SidebarNavigation from "@/src/components/layouts/Sidebar/Sidebar";
+import SidebarContent from "@/src/components/layouts/Sidebar/SidebarContent";
 import React from "react";
 
 interface LayoutContentProps {
@@ -8,12 +10,23 @@ interface LayoutContentProps {
 
 const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen">
+      {/* Header */}
       <Header />
-      <div className="flex flex-1 relative md:overflow-hidden">
-        <main className="flex-1">{children}</main>
+
+      {/* Body（残り高さを固定） */}
+      <div className="flex flex-1 min-h-0">
+        {/* Sidebar（スクロールしない） */}
+        <aside className="w-12 shrink-0">
+          <SidebarNavigation />
+        </aside>
+
+        {/* Main（ここだけスクロール） */}
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
-      <Footer />
+
+      {/* Footer（不要なら消す） */}
+      {/* <Footer /> */}
     </div>
   );
 };
