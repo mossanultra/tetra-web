@@ -7,6 +7,7 @@ import { ImageModal } from "@/src/features/thread/components/ImageModal";
 import { CreateThreadModal } from "./CreateThreadModal";
 import { FaPlus } from "react-icons/fa";
 import { useTimeline } from "@/src/features/timeline/hooks/useTimeline";
+import { useThread } from "@/src/features/thread/hooks/useThread";
 import { Thread } from "../../thread/types/Thread";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
 
 export default function TimelineClient({ initialItems, ownUserId }: Props) {
   const { items, loading, error, refetch } = useTimeline(initialItems);
+  const { createThread, submitReply } = useThread();
   const [openImage, setOpenImage] = useState<string | null>(null);
   const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(
     new Set()
@@ -34,23 +36,7 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
     if (!replyTarget) return;
 
     try {
-      const body = {
-        threadName: text,
-        parentThreadId: replyTarget.threadId,
-        imageBase64: image,
-      };
-
-      const res = await fetch("/api/timeline/thread/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        throw new Error(`返信の投稿に失敗しました (${res.status})`);
-      }
+      await submitReply(replyTarget.threadId, text, image);
 
       // 成功したらモーダルを閉じてタイムラインを更新
       setReplyModalOpen(false);
@@ -59,35 +45,17 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : "返信の投稿に失敗しました");
-      throw err;
     }
   };
 
   const handleSubmitThread = async (text: string, image: string | null) => {
     try {
-      const body = {
-        threadName: text,
-        imageBase64: image,
-      };
-
-      const res = await fetch("/api/timeline/thread/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        throw new Error(`投稿に失敗しました (${res.status})`);
-      }
-
+      await createThread(text, image);
       setCreateModalOpen(false);
       await refetch();
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : "投稿に失敗しました");
-      throw err;
     }
   };
 

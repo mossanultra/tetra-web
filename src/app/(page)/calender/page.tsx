@@ -8,12 +8,14 @@ import { ReplyModal } from "@/src/features/thread/components/ReplyModal";
 import { ThreadCard } from "@/src/features/thread/components/ThreadCard";
 import { ThreadSkeleton } from "@/src/features/thread/components/ThreadSkeleton";
 import { Thread } from "@/src/features/thread/types/Thread";
+import { useThread } from "@/src/features/thread/hooks/useThread";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const CalendarTimelinePage = () => {
   const [dateRange, setDateRange] = useState<Value>(null);
+  const { submitReply: submitReplyApi, fetchThreadsByDate } = useThread();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(false);
   const [userId, serUserId] = useState<string | null>(null);
@@ -31,11 +33,9 @@ const CalendarTimelinePage = () => {
     setDateRange(value);
   };
 
-  const fetchThreads = async () => {
+  const loadThreads = async () => {
     if (!dateRange) return;
-
     setError(null);
-
     try {
       let startDate: Date;
       let endDate: Date;
@@ -48,33 +48,16 @@ const CalendarTimelinePage = () => {
         endDate = dateRange;
       }
 
-      const startDateStr = startDate.toISOString().split("T")[0];
-      const endDateStr = endDate.toISOString().split("T")[0];
-
-      const res = await fetch(
-        `/api/timeline/query?startDate=${startDateStr}&endDate=${endDateStr}&limit=20`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error(`データ取得に失敗しました (${res.status})`);
-      }
-
-      const data = await res.json();
-      setThreads(data.threads || []);
+      const threadsData = await fetchThreadsByDate(startDate, endDate);
+      setThreads(threadsData);
     } catch (err) {
       console.error(err);
       setError(
         err instanceof Error ? err.message : "不明なエラーが発生しました"
       );
-    } finally {
     }
   };
+
   const fetchUserId = async () => {
     try {
       const res = await fetch(`/api/user`, {
@@ -100,12 +83,15 @@ const CalendarTimelinePage = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    fetchUserId();
-    if (dateRange) {
-      fetchThreads();
-    }
-    setLoading(false);
+    const init = async () => {
+      setLoading(true);
+      await fetchUserId();
+      if (dateRange) {
+        await loadThreads();
+      }
+      setLoading(false);
+    };
+    init();
   }, [dateRange]);
 
   const getSelectedDateRange = () => {
@@ -145,26 +131,14 @@ const CalendarTimelinePage = () => {
   const submitReply = async (text: string, image: string | null) => {
     if (!replyTarget) return;
 
-    const body = {
-      threadName: text,
-      parentThreadId: replyTarget.threadId,
-      imageBase64: image || null,
-    };
-
-    const res = await fetch("/api/timeline/thread/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      throw new Error(`返信の投稿に失敗しました (${res.status})`);
+    try {
+      await submitReplyApi(replyTarget.threadId, text, image);
+      closeReplyModal();
+      await loadThreads();
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
-
-    closeReplyModal();
-    await fetchThreads();
   };
 
   const toggleBookmark = (threadId: string) => {
