@@ -45,11 +45,7 @@ export default function ThreadClient({
   const toggleBookmark = (threadId: string) => {
     setBookmarkedThreads((prev) => {
       const set = new Set(prev);
-      if (set.has(threadId)) {
-        set.delete(threadId);
-      } else {
-        set.add(threadId);
-      }
+      set.has(threadId) ? set.delete(threadId) : set.add(threadId);
       return set;
     });
   };
@@ -84,7 +80,7 @@ export default function ThreadClient({
             onImageClick={setOpenImage}
             isBookmarked={bookmarkedThreads.has(thread.threadId)}
             onToggleBookmark={toggleBookmark}
-            isCompact={true}
+            isCompact={false}
             currentUserId={ownUserId}
             onDeleted={handleDeleted}
             onReport={() => {
