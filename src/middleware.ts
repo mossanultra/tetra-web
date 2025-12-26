@@ -66,8 +66,12 @@ export async function middleware(req: NextRequest) {
     try {
       // ユーザーが存在するかチェックする
       const isUser = await createOrVerifyUser(session.idToken!);
-      if (isUser === "unauthorized" || isUser === 'failed') {
-      console.log("[Middleware] Not Found User. Redirecting to /new-user");
+      if (isUser === "unauthorized" ) {
+        console.log("[Middleware] Not Found User or Unauthorized. Redirecting to /login-prompt");
+        return NextResponse.redirect(new URL("/login-prompt", req.url));
+      }
+      if(isUser === 'failed'){
+        console.log("[Middleware] Failed to check user. Redirecting to /login-prompt");
         return NextResponse.redirect(new URL("/new-user", req.url));
       }
 

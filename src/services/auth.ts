@@ -31,10 +31,11 @@ async function refreshTokens(token: JWT): Promise<{
   }
 
   try {
-    const baseUrl =
-      process.env.NEXTAUTH_URL ||
-      process.env.VERCEL_URL ||
-      "http://localhost:3000";
+    let baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL || "http://localhost:3000";
+
+    if (process.env.VERCEL_URL && !baseUrl.startsWith("http")) {
+      baseUrl = `https://${baseUrl}`;
+    }
 
     const response = await fetch(`${baseUrl}/api/auth/refresh-token`, {
       // const response = await fetch(`/api/auth/refresh-token`, {
