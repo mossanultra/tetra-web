@@ -103,6 +103,10 @@ const usePinCreation = (
       onGuestAction();
       return;
     }
+    if (pinModalOpen) {
+      setPinModalOpen(false);
+      return;
+    }
 
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
@@ -217,13 +221,22 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({
         mapContainerStyle={MAP_CONTAINER_STYLE}
         center={center}
         zoom={zoom}
-        onClick={pinCreation.handleMapClick}
+        onClick={(e) => {
+          if (activeId) {
+            setActiveId(null);
+            return;
+          }
+
+          pinCreation.handleMapClick(e);
+        }}
       >
         {pointList?.map((p) => (
           <React.Fragment key={p.id}>
             <Marker
               position={{ lat: p.lat, lng: p.lng }}
-              onClick={() => setActiveId(p.id)}
+              onClick={() => {
+                setActiveId(p.id);
+              }}
             />
 
             {activeId === p.id && (
