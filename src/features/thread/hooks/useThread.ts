@@ -48,7 +48,19 @@ export const useThread = (
       if (!res.ok) throw new Error("failed");
 
       const newThread = await res.json();
-      setChildThreads((prev) => [newThread, ...prev]);
+
+      // 子スレッドへの返信だった場合は当該子スレッドのリプライ数のみを調整する
+      if (newThread.parentThreadId) {
+        setChildThreads((prev) =>
+          prev.map((t) =>
+            t.threadId === newThread.parentThreadId
+              ? { ...t, childThreadCount: t.childThreadCount + 1 }
+              : t
+          )
+        );
+      } else {
+        setChildThreads((prev) => [newThread, ...prev]);
+      }
       return newThread;
     } catch (err) {
       setError("返信に失敗しました");
