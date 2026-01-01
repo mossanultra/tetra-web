@@ -9,13 +9,16 @@ import {
   FaStream,
   FaCalendarAlt,
   FaSignOutAlt,
+  FaUser,
 } from "react-icons/fa";
+import { useProfile } from "@/src/features/user/hooks/useProfile";
 
 const navItems = [
-  { href: "/home", label: "Home", icon: FaHome },
-  { href: "/map", label: "Map", icon: FaMapMarkedAlt },
-  { href: "/timeline", label: "Timeline", icon: FaStream },
-  { href: "/calender", label: "Calendar", icon: FaCalendarAlt },
+  { href: "/home", label: "ホーム", icon: FaHome },
+  { href: "/map", label: "マップ", icon: FaMapMarkedAlt },
+  { href: "/timeline", label: "タイムライン", icon: FaStream },
+  { href: "/calender", label: "カレンダー", icon: FaCalendarAlt },
+  { href: "/profile/@self", label: "プロフィール", icon: FaUser },
 ];
 
 interface Props {
@@ -26,6 +29,7 @@ interface Props {
 export default function SidebarNavigation({ open, onClose }: Props) {
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
+  const { data: profile } = useProfile();
 
   // 外側クリックで閉じる
   useEffect(() => {
@@ -42,21 +46,54 @@ export default function SidebarNavigation({ open, onClose }: Props) {
     <>
       {/* 背景オーバーレイ */}
       {open && (
-        <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity"
+          onClick={onClose}
+        />
       )}
 
       {/* Sidebar */}
       <aside
         ref={ref}
         className={`
-          fixed z-50 top-0 left-0 h-screen w-14
-          bg-neutral-900 text-white
-          flex flex-col items-center py-3
-          transition-transform duration-200
+          fixed z-50 top-0 left-0 h-screen w-64
+          bg-neutral-900 text-white shadow-2xl
+          flex flex-col py-6 px-4
+          transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        <nav className="flex flex-col gap-2 flex-1">
+        {/* Profile Section */}
+        {/* <div className="mb-8 px-2">
+          <Link
+            href="/profile/@self"
+            onClick={onClose}
+            className="flex items-center gap-3 p-2 rounded-xl hover:bg-neutral-800 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-neutral-700 bg-neutral-800 flex items-center justify-center">
+              {profile?.imageUrl ? (
+                <img
+                  src={profile.imageUrl}
+                  alt="プロフィール"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <FaUser className="text-neutral-500" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-sm truncate">
+                {profile?.userName ?? "ゲスト"}
+              </p>
+              <p className="text-xs text-neutral-500 truncate">
+                プロフィールを表示
+              </p>
+            </div>
+          </Link>
+        </div> */}
+
+        {/* Navigation */}
+        <nav className="flex flex-col gap-1 flex-1">
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
 
@@ -64,31 +101,34 @@ export default function SidebarNavigation({ open, onClose }: Props) {
               <Link
                 key={href}
                 href={href}
-                aria-label={label}
                 onClick={onClose}
                 className={`
-                  w-10 h-10 flex items-center justify-center rounded-lg
+                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
                   ${
                     active
-                      ? "bg-white text-neutral-900"
-                      : "hover:bg-neutral-800"
+                      ? "bg-white text-neutral-900 font-bold shadow-lg shadow-white/10"
+                      : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
                   }
                 `}
               >
-                <Icon className="text-sm" />
+                <Icon size={20} />
+                <span className="text-sm">{label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <Link
-          href="/signout"
-          onClick={onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-600"
-          aria-label="ログアウト"
-        >
-          <FaSignOutAlt className="text-sm" />
-        </Link>
+        {/* Bottom Actions */}
+        <div className="mt-auto border-t border-neutral-800 pt-4">
+          <Link
+            href="/signout"
+            onClick={onClose}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200"
+          >
+            <FaSignOutAlt size={20} />
+            <span className="text-sm font-medium">サインアウト</span>
+          </Link>
+        </div>
       </aside>
     </>
   );
