@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   FaUser,
   FaRegCalendar,
@@ -76,7 +77,16 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             <FaBars />
           </button>
 
-          <h1 className="text-sm font-semibold tracking-wide">マチップ</h1>
+          <Link href="/timeline" className="flex items-center">
+            <Image
+              src="/images/toplogo.png"
+              alt="マチップ"
+              width={100}
+              height={32}
+              className="h-8 w-auto object-contain"
+              priority
+            />
+          </Link>
         </div>
 
         {/* ▼ 右側：ユーザーアイコン */}
