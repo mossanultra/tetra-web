@@ -28,6 +28,29 @@ async function getProfile(token: string): Promise<UserCheckResult> {
     return "failed";
   }
 }
+async function getUser(token: string): Promise<UserCheckResult> {
+  if (!token) return "unauthorized";
+
+  try {
+    // ユーザーの存在確認
+    const res = await fetch(`${baseUrl}/user`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    });
+    if (res.status === 200) {
+      return "ok";
+    } else {
+      console.error("Error checking user:", res.status, res.statusText);
+      return "failed";
+    }
+  } catch (error) {
+    console.error("Error in createOrVerifyUser:", error);
+    return "failed";
+  }
+}
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -54,6 +77,23 @@ export async function middleware(req: NextRequest) {
     const isValid = session.expires && new Date(session.expires) > new Date();
     if (!isValid) {
       console.log("[Middleware] Session expired. Redirecting to /login-prompt");
+      return NextResponse.redirect(new URL("/login-prompt", req.url));
+    }
+
+    // sessionが有効なのにユーザーがいないと場合はユーザーが削除されたと判断し、
+    // セッションをクリアしてログインプロンプトに戻す
+    try {
+      const isUser = await getUser(session.idToken!);
+      if (isUser === "failed") {
+        console.log(
+          "[Middleware] Not Found User or Unauthorized. Redirecting to /login-prompt"
+        );
+
+        return NextResponse.redirect(new URL("/login-prompt", req.url));
+      }
+    } catch (error) {
+      console.error("[Middleware] Error checking user status:", error);
+      // エラーが発生した場合はログインプロンプトに戻す
       return NextResponse.redirect(new URL("/login-prompt", req.url));
     }
 

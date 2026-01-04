@@ -67,3 +67,31 @@ export async function POST() {
     return NextResponse.json({ error: error }, { status: 500 });
   }
 }
+export async function DELETE() {
+  try {
+    console.log("DELETE");
+    const session = await auth();
+
+    if (!session?.idToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const response = await fetch(`${apiBaseUrl}/user`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: session.idToken as string,
+      },
+    });
+
+    console.log(response);
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete user: ${response.status}`);
+    }
+
+    const deletedUser = await response.json();
+    return NextResponse.json(deletedUser);
+  } catch (error) {
+    return NextResponse.json({ error: error }, { status: 500 });
+  }
+}

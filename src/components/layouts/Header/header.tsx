@@ -15,15 +15,20 @@ import {
   useLoginMode,
   LoginMode,
 } from "@/src/features/user/hooks/useLoginMode";
+import { useRouter } from "next/navigation";
+import { DeleteAccountConfirmDialog } from "@/src/features/user/components/DeleteAccountConfirmDialog";
+import { FaTrashAlt } from "react-icons/fa";
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const router = useRouter();
   const { data, fetchProfile, clearProfile } = useProfile();
   const { getLoginMode } = useLoginMode();
   const [open, setOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isGuest, setIsGuest] = useState(true); // Default to guest or loading?
   const [isLoading, setIsLoading] = useState(true);
   const popupRef = useRef<HTMLDivElement | null>(null);
@@ -174,11 +179,47 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                       <FaSignOutAlt />
                       サインアウト
                     </Link>
+
+                    <div className="h-px bg-gray-200 my-2" />
+
+                    <button
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 w-full text-left"
+                      onClick={() => {
+                        setOpen(false);
+                        setDeleteDialogOpen(true);
+                      }}
+                    >
+                      <FaTrashAlt />
+                      アカウント削除
+                    </button>
                   </div>
                 </div>
               )}
             </>
           )}
+
+          {/* Delete Account Confirmation Dialog */}
+          <DeleteAccountConfirmDialog
+            isOpen={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            onDelete={async () => {
+              try {
+                const res = await fetch("/api/user", {
+                  method: "DELETE",
+                });
+                if (!res.ok) {
+                  const errorData = await res.json();
+                  throw new Error(errorData.error || "削除に失敗しました");
+                }
+                // 成功したらサインアウトページへ遷移（自動的にセッションクリアされる想定）
+                router.push("/signout");
+              } catch (error) {
+                console.error("Account deletion failed:", error);
+                alert("アカウントの削除に失敗しました。");
+                throw error; // Dialogのローディング状態を解除するために必要ならthrowするか、Dialog側でcatchさせる
+              }
+            }}
+          />
         </div>
       </div>
     </header>
