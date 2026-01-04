@@ -195,6 +195,11 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({
   const pinCreation = usePinCreation(setPoints, getLoginMode, openDialog);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [pinDetailModalOpen, setPinDetailModalOpen] = useState(false);
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  const onMapLoad = React.useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+  }, []);
 
   useEffect(() => {
     fetchPoints().then(setPoints);
@@ -202,6 +207,24 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({
 
   // Only check if Google Maps is loaded, allow guest users to view the map
   if (!isLoaded) return null;
+
+  const handleMarkerClick = (point: Point) => {
+    setActiveId(point.id);
+    if (mapRef.current) {
+      const latLng = { lat: point.lat, lng: point.lng };
+      mapRef.current.panTo(latLng);
+
+      const div = mapRef.current.getDiv();
+      const width = div.offsetWidth;
+      // ピンを左端（左から25%または80pxなどの位置）に寄せる
+      // そのために、マップ中心を右にずらす (panByのxをプラスにする)
+      // 例: 中心(W/2) から 左位置(TargetX) への移動量 = W/2 - TargetX
+      const targetX = Math.min(width * 0.1, 80); // 画面幅の20%か80pxの小さい方
+      const offsetX = width / 2 - targetX;
+
+      mapRef.current.panBy(offsetX, 0);
+    }
+  };
 
   return (
     <>
@@ -221,6 +244,7 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({
         mapContainerStyle={MAP_CONTAINER_STYLE}
         center={center}
         zoom={zoom}
+        onLoad={onMapLoad}
         onClick={(e) => {
           if (activeId) {
             setActiveId(null);
@@ -234,9 +258,7 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({
           <React.Fragment key={p.id}>
             <Marker
               position={{ lat: p.lat, lng: p.lng }}
-              onClick={() => {
-                setActiveId(p.id);
-              }}
+              onClick={() => handleMarkerClick(p)}
             />
 
             {activeId === p.id && (
@@ -244,7 +266,8 @@ const MapWithCustomModalMarker: React.FC<MapWithCustomModalMarkerProps> = ({
                 position={{ lat: p.lat, lng: p.lng }}
                 mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
               >
-                <div style={{ transform: "translate(-50%, -110%)" }}>
+                {/* ピンの右側に吹き出しを表示するように変更 */}
+                <div style={{ transform: "translate(20px, -50%)" }}>
                   <MarkerDetailDialog
                     point={p}
                     isOpen={pinDetailModalOpen}

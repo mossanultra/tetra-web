@@ -37,7 +37,7 @@ export const MarkerDetailDialog: React.FC<Props> = ({
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: 400,
+          width: "min(300px, 80vw)",
           maxHeight: "90vh",
           overflowY: "auto",
           background: "transparent",
