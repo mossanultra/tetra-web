@@ -11,9 +11,6 @@ export async function GET(
   try {
     const session = await auth();
     const { threadId } = await params;
-    // if (!session?.idToken) {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // }
 
     // バックエンドAPIへの呼び出し
     const response = await fetch(
