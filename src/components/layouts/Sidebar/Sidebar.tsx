@@ -10,13 +10,16 @@ import {
   FaCalendarAlt,
   FaSignOutAlt,
   FaUser,
+  FaEnvelope,
 } from "react-icons/fa";
 import { useProfile } from "@/src/features/user/hooks/useProfile";
+import { useInboxSummary } from "@/src/features/inbox/hooks/useInboxSummary";
 
 const navItems = [
   { href: "/home", label: "ホーム", icon: FaHome },
   { href: "/map", label: "マップ", icon: FaMapMarkedAlt },
   { href: "/timeline", label: "タイムライン", icon: FaStream },
+  { href: "/inbox", label: "受信トレイ", icon: FaEnvelope },
   { href: "/calender", label: "カレンダー", icon: FaCalendarAlt },
   { href: "/profile/@self", label: "プロフィール", icon: FaUser },
 ];
@@ -30,6 +33,7 @@ export default function SidebarNavigation({ open, onClose }: Props) {
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
   const { data: profile } = useProfile();
+  const { unreadCount } = useInboxSummary();
 
   // 外側クリックで閉じる
   useEffect(() => {
@@ -63,39 +67,11 @@ export default function SidebarNavigation({ open, onClose }: Props) {
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        {/* Profile Section */}
-        {/* <div className="mb-8 px-2">
-          <Link
-            href="/profile/@self"
-            onClick={onClose}
-            className="flex items-center gap-3 p-2 rounded-xl hover:bg-neutral-800 transition-colors"
-          >
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-neutral-700 bg-neutral-800 flex items-center justify-center">
-              {profile?.imageUrl ? (
-                <img
-                  src={profile.imageUrl}
-                  alt="プロフィール"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <FaUser className="text-neutral-500" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm truncate">
-                {profile?.userName ?? "ゲスト"}
-              </p>
-              <p className="text-xs text-neutral-500 truncate">
-                プロフィールを表示
-              </p>
-            </div>
-          </Link>
-        </div> */}
-
         {/* Navigation */}
         <nav className="flex flex-col gap-1 flex-1">
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
+            const isInbox = href === "/inbox";
 
             return (
               <Link
@@ -103,7 +79,7 @@ export default function SidebarNavigation({ open, onClose }: Props) {
                 href={href}
                 onClick={onClose}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 relative
                   ${
                     active
                       ? "bg-white text-neutral-900 font-bold shadow-lg shadow-white/10"
@@ -111,7 +87,14 @@ export default function SidebarNavigation({ open, onClose }: Props) {
                   }
                 `}
               >
-                <Icon size={20} />
+                <div className="relative">
+                  <Icon size={20} />
+                  {isInbox && unreadCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full px-1 border-2 border-neutral-900 shadow-sm">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </div>
                 <span className="text-sm">{label}</span>
               </Link>
             );
