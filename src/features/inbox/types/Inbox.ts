@@ -4,11 +4,37 @@ export interface InboxMessageSender {
   avatar: string;
 }
 
+// Parsed content types for different message types
+export interface SystemMessageContent {
+  message: string;
+}
+
+export interface ReplyMessageContent {
+  ownerThreadId: string;
+  threadId: string;
+  content: string;
+  replyUserId: string;
+  replyUserName: string;
+}
+
+export interface NewEventMessageContent {
+  pointInfoId: string; // Same as threadId
+  ownerUserId: string;
+  address: string;
+  title: string;
+  date: string;
+}
+
+export type ParsedMessageContent =
+  | SystemMessageContent
+  | ReplyMessageContent
+  | NewEventMessageContent;
+
 export interface InboxMessageContent {
   id: string;
   type: string;
   subject: string;
-  content: string;
+  content: string; // JSON string from API
   sender: InboxMessageSender;
   createdAt: string;
 }

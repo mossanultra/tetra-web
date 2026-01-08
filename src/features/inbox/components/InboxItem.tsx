@@ -1,7 +1,13 @@
 import React from "react";
 import Image from "next/image";
-import { InboxMessage } from "../types/Inbox";
+import Link from "next/link";
+import {
+  InboxMessage,
+  ReplyMessageContent,
+  NewEventMessageContent,
+} from "../types/Inbox";
 import { MdDeleteOutline } from "react-icons/md";
+import { parseMessageContent } from "../utils/messageParser";
 
 interface InboxItemProps {
   message: InboxMessage;
@@ -41,6 +47,14 @@ export const InboxItem: React.FC<InboxItemProps> = ({
 
   const senderName = message.message.sender?.name || "システム通知";
   const avatarUrl = message.message.sender?.avatar || "/default-user.png";
+
+  // Parse message content
+  const { displayContent, parsedContent } = parseMessageContent(
+    message.message
+  );
+  const isReplyMessage = message.message.type === "reply" && parsedContent;
+  const isNewEventMessage =
+    message.message.type === "newEvent" && parsedContent;
 
   return (
     <article
@@ -93,10 +107,48 @@ export const InboxItem: React.FC<InboxItemProps> = ({
           </div>
 
           <p className="text-[15px] text-gray-900 leading-normal whitespace-pre-wrap line-clamp-2 break-all">
-            {message.message.content}
-            {/* Display messageId for debugging/confirmation if needed, normally hidden */}
-            {/* <span className="text-xs text-gray-300 ml-2">#{message.messageId}</span> */}
+            {displayContent}
           </p>
+
+          {/* Reply message additional info */}
+          {isReplyMessage && (
+            <div className="mt-2 flex items-center gap-2 text-sm">
+              <Link
+                href={`/timeline/${
+                  (parsedContent as ReplyMessageContent).ownerThreadId
+                }`}
+                className="text-blue-600 hover:text-blue-700 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                スレッドを見る →
+              </Link>
+            </div>
+          )}
+
+          {/* New event message additional info */}
+          {isNewEventMessage && (
+            <div className="mt-2 flex items-center gap-3 text-sm">
+              <span className="text-gray-600">
+                📅{" "}
+                {new Date(
+                  (parsedContent as NewEventMessageContent).date
+                ).toLocaleDateString("ja-JP", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+              <Link
+                href={`/timeline/${
+                  (parsedContent as NewEventMessageContent).pointInfoId
+                }`}
+                className="text-blue-600 hover:text-blue-700 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                イベントを見る →
+              </Link>
+            </div>
+          )}
         </div>
         {!message.isRead && (
           <div className="flex items-center justify-center flex-shrink-0 ml-2 self-center">
