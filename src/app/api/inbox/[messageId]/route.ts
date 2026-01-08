@@ -44,3 +44,45 @@ export async function GET(
     );
   }
 }
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ messageId: string }> }
+) {
+  console.log("DELETE");
+  try {
+    const session = await auth();
+
+    if (!session?.idToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { messageId } = await params;
+
+    const response = await fetch(`${apiBaseUrl}/inbox/${messageId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${session?.idToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return NextResponse.json(
+          { error: "Message not found" },
+          { status: 404 }
+        );
+      }
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const responseJson = await response.json();
+    return NextResponse.json(responseJson);
+  } catch (error) {
+    console.error("Inbox message detail API error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch message detail" },
+      { status: 500 }
+    );
+  }
+}
