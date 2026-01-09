@@ -4,6 +4,7 @@ import Footer from "@/src/components/layouts/Footer/footer";
 import Header from "@/src/components/layouts/Header/header";
 import SidebarNavigation from "@/src/components/layouts/Sidebar/Sidebar";
 import SidebarContent from "@/src/components/layouts/Sidebar/SidebarContent";
+import BottomNav from "@/src/components/layouts/BottomNav/BottomNav";
 import React, { useState } from "react";
 
 interface LayoutContentProps {
@@ -25,9 +26,12 @@ const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
           onClose={() => setSidebarOpen(false)}
         />
 
-        {/* Main（ここだけスクロール） */}
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        {/* Main（ここだけスクロール） - Add bottom padding on mobile for bottom nav */}
+        <main className="flex-1 overflow-y-auto pb-16 md:pb-0">{children}</main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <BottomNav />
 
       {/* Footer（不要なら消す） */}
       {/* <Footer /> */}
