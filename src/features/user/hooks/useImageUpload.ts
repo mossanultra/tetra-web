@@ -1,16 +1,45 @@
 import { useState } from "react";
+import { resizeImage } from "@/src/utils/imageResize";
 
 export const useImageUpload = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [isResizing, setIsResizing] = useState(false);
 
-  const handleImageChange = (file: File) => {
-    setProfileImage(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+  const handleImageChange = async (file: File) => {
+    try {
+      setIsResizing(true);
+
+      // Automatically resize image if it's too large
+      // Max dimensions: 1920x1920, quality: 0.9
+      const resizedFile = await resizeImage(file, 1920, 1920, 0.9);
+
+      console.log("Original size:", file.size, "bytes");
+      console.log("Resized size:", resizedFile.size, "bytes");
+      console.log(
+        "Compression ratio:",
+        ((1 - resizedFile.size / file.size) * 100).toFixed(1) + "%"
+      );
+
+      setProfileImage(resizedFile);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(resizedFile);
+    } catch (error) {
+      console.error("Image resize error:", error);
+      // Fallback to original file if resize fails
+      setProfileImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setIsResizing(false);
+    }
   };
 
   const handleImageRemove = () => {
@@ -22,24 +51,6 @@ export const useImageUpload = () => {
     setImagePreview(url);
   };
 
-  const convertToBase64 = async (file: File): Promise<string> => {
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        const base64String = result.split(",")[1];
-        resolve(base64String);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const getImageBase64 = async (): Promise<string> => {
-    if (!profileImage) return "";
-    return await convertToBase64(profileImage);
-  };
-
   const getImageFile = (): File | null => {
     return profileImage;
   };
@@ -49,7 +60,7 @@ export const useImageUpload = () => {
     handleImageChange,
     handleImageRemove,
     setInitialPreview,
-    getImageBase64,
     getImageFile,
+    isResizing,
   };
 };
