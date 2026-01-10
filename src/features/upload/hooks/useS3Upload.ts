@@ -65,6 +65,17 @@ export const useS3Upload = () => {
       return fileUrl;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Upload failed";
+
+      // Debug alert for mobile
+      const errorDetails = `
+S3 Upload Error:
+Message: ${errorMessage}
+File: ${file.name}
+Type: ${file.type}
+Size: ${file.size}
+      `.trim();
+      alert(errorDetails);
+
       setError(errorMessage);
       console.error("S3 upload error:", err);
       return null;
