@@ -36,6 +36,11 @@ export const ThreadComposerModal: React.FC<ThreadComposerModalProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       try {
+        console.log("=== Thread Image Resize Start ===");
+        console.log("File name:", file.name);
+        console.log("File type:", file.type);
+        console.log("File size:", file.size, "bytes");
+
         // Resize image before preview
         const resizedFile = await resizeImage(file, 1920, 1920, 0.9);
 
@@ -54,6 +59,23 @@ export const ThreadComposerModal: React.FC<ThreadComposerModalProps> = ({
         reader.readAsDataURL(resizedFile);
       } catch (error) {
         console.error("Image resize error:", error);
+
+        // Display detailed error for mobile debugging
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        const errorStack = error instanceof Error ? error.stack : "";
+        const detailedError = `
+エラー発生:
+メッセージ: ${errorMessage}
+ファイル名: ${file.name}
+ファイルタイプ: ${file.type}
+ファイルサイズ: ${file.size} bytes
+スタック: ${errorStack}
+        `.trim();
+
+        alert(detailedError);
+        console.error("Detailed error:", detailedError);
+
         // Fallback to original file
         setImage(file);
         const reader = new FileReader();
