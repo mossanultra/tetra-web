@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import ReactPaginate from "react-paginate";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { useInbox } from "../hooks/useInbox";
 import { InboxItem } from "./InboxItem";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 export const InboxList: React.FC = () => {
   const {
@@ -60,32 +59,34 @@ export const InboxList: React.FC = () => {
         </button>
       </div>
 
-      <div className="divide-y divide-gray-100">
-        {messages.map((message) => (
-          <InboxItem
-            key={message.messageId}
-            message={message}
-            onRead={markAsRead}
-            onDelete={deleteMessage}
-            isMarking={isMarking}
-          />
-        ))}
-      </div>
-
-      {hasMore && (
-        <div className="flex justify-center py-8">
-          <button
-            onClick={loadMore}
-            disabled={isLoading}
-            className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-medium transition disabled:opacity-50 flex items-center gap-2"
-          >
-            {isLoading && (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700" />
-            )}
-            もっと見る
-          </button>
+      <InfiniteScroll
+        dataLength={messages.length}
+        next={loadMore}
+        hasMore={hasMore}
+        scrollableTarget="scrollableDiv"
+        loader={
+          <div className="flex justify-center items-center py-6">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500" />
+          </div>
+        }
+        endMessage={
+          <div className="p-8 text-center text-gray-500 text-sm">
+            すべてのメッセージを表示しました
+          </div>
+        }
+      >
+        <div className="divide-y divide-gray-100">
+          {messages.map((message) => (
+            <InboxItem
+              key={message.messageId}
+              message={message}
+              onRead={markAsRead}
+              onDelete={deleteMessage}
+              isMarking={isMarking}
+            />
+          ))}
         </div>
-      )}
+      </InfiniteScroll>
     </div>
   );
 };
