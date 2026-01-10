@@ -27,7 +27,12 @@ const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
         />
 
         {/* Main（ここだけスクロール） - Add bottom padding on mobile for bottom nav */}
-        <main className="flex-1 overflow-y-auto pb-16 md:pb-0">{children}</main>
+        <main
+          id="scrollableDiv"
+          className="flex-1 overflow-y-auto pb-16 md:pb-0"
+        >
+          {children}
+        </main>
       </div>
 
       {/* Mobile Bottom Navigation */}

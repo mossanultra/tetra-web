@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import ReactPaginate from "react-paginate";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { useInbox } from "../hooks/useInbox";
 import { InboxItem } from "./InboxItem";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 export const InboxList: React.FC = () => {
   const {
@@ -15,10 +14,12 @@ export const InboxList: React.FC = () => {
     markAllAsRead,
     isMarking,
     deleteMessage,
-    pagination,
+    loadMore,
+    hasMore,
   } = useInbox();
 
-  if (isLoading) {
+  // Initial load only
+  if (isLoading && messages.length === 0) {
     return (
       <div className="flex justify-center items-center py-20">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
@@ -34,7 +35,7 @@ export const InboxList: React.FC = () => {
     );
   }
 
-  if (messages.length === 0 && pagination.pageCount <= 1) {
+  if (messages.length === 0 && !isLoading) {
     return (
       <div className="p-8 text-center text-gray-500">
         メッセージはありません。
@@ -47,10 +48,7 @@ export const InboxList: React.FC = () => {
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold text-gray-900">受信トレイ</h1>
-          <span className="text-sm text-gray-500">
-            {pagination.pageCount > 0 &&
-              `${pagination.currentPage + 1} / ${pagination.pageCount} ページ`}
-          </span>
+          <span className="text-sm text-gray-500">{messages.length}件</span>
         </div>
         <button
           onClick={markAllAsRead}
@@ -61,11 +59,22 @@ export const InboxList: React.FC = () => {
         </button>
       </div>
 
-      {messages.length === 0 ? (
-        <div className="p-8 text-center text-gray-500">
-          このページのメッセージはありません。
-        </div>
-      ) : (
+      <InfiniteScroll
+        dataLength={messages.length}
+        next={loadMore}
+        hasMore={hasMore}
+        scrollableTarget="scrollableDiv"
+        loader={
+          <div className="flex justify-center items-center py-6">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500" />
+          </div>
+        }
+        endMessage={
+          <div className="p-8 text-center text-gray-500 text-sm">
+            すべてのメッセージを表示しました
+          </div>
+        }
+      >
         <div className="divide-y divide-gray-100">
           {messages.map((message) => (
             <InboxItem
@@ -77,43 +86,7 @@ export const InboxList: React.FC = () => {
             />
           ))}
         </div>
-      )}
-
-      {pagination.pageCount > 1 && (
-        <div className="flex justify-center py-8">
-          <ReactPaginate
-            previousLabel={<FaChevronLeft className="w-4 h-4" />}
-            nextLabel={<FaChevronRight className="w-4 h-4" />}
-            breakLabel={"..."}
-            breakClassName={"px-3 py-2 text-gray-500"}
-            pageCount={pagination.pageCount}
-            marginPagesDisplayed={1}
-            pageRangeDisplayed={3}
-            onPageChange={({ selected }) => pagination.onPageChange(selected)}
-            forcePage={pagination.currentPage}
-            containerClassName={
-              "flex items-center gap-1 bg-white p-2 rounded-lg shadow-sm border border-gray-100"
-            }
-            pageClassName={"rounded-md overflow-hidden"}
-            pageLinkClassName={
-              "block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            }
-            activeClassName={"bg-blue-500 text-white hover:bg-blue-600"}
-            activeLinkClassName={
-              "!text-white hover:!bg-blue-600 hover:!text-white"
-            }
-            previousClassName={"rounded-md overflow-hidden mr-1"}
-            previousLinkClassName={
-              "block p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors"
-            }
-            nextClassName={"rounded-md overflow-hidden ml-1"}
-            nextLinkClassName={
-              "block p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors"
-            }
-            disabledClassName={"opacity-50 pointer-events-none"}
-          />
-        </div>
-      )}
+      </InfiniteScroll>
     </div>
   );
 };
