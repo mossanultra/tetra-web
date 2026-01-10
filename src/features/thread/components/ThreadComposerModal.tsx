@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import { FaTimes, FaImage } from "react-icons/fa";
 import { useS3Upload } from "@/src/features/upload/hooks/useS3Upload";
+import { resizeImage } from "@/src/utils/imageResize";
 
 interface ThreadComposerModalProps {
   isOpen: boolean;
@@ -31,15 +32,36 @@ export const ThreadComposerModal: React.FC<ThreadComposerModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        // Resize image before preview
+        const resizedFile = await resizeImage(file, 1920, 1920, 0.9);
+
+        console.log("Original size:", file.size, "bytes");
+        console.log("Resized size:", resizedFile.size, "bytes");
+        console.log(
+          "Compression ratio:",
+          ((1 - resizedFile.size / file.size) * 100).toFixed(1) + "%"
+        );
+
+        setImage(resizedFile);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(resizedFile);
+      } catch (error) {
+        console.error("Image resize error:", error);
+        // Fallback to original file
+        setImage(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

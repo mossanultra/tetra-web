@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 interface ProfileImageUploadProps {
   imagePreview: string | null;
-  onImageChange: (file: File) => void;
+  onImageChange: (file: File) => Promise<void>;
   onImageRemove: () => void;
   disabled?: boolean;
   onError: (message: string) => void;
@@ -17,25 +17,28 @@ export const ProfileImageUpload = ({
 }: ProfileImageUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const validateAndProcessFile = (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      onError("画像ファイルは5MB以下にしてください");
-      return false;
-    }
+  const validateAndProcessFile = async (file: File) => {
+    // Remove size check - resizing will handle large files
+    // if (file.size > 5 * 1024 * 1024) {
+    //   onError("画像ファイルは5MB以下にしてください");
+    //   return false;
+    // }
 
     if (!file.type.startsWith("image/")) {
       onError("画像ファイルを選択してください");
       return false;
     }
 
-    onImageChange(file);
+    await onImageChange(file);
     return true;
   };
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
-      validateAndProcessFile(file);
+      await validateAndProcessFile(file);
     }
   };
 
@@ -44,13 +47,13 @@ export const ProfileImageUpload = ({
     e.stopPropagation();
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      validateAndProcessFile(file);
+      await validateAndProcessFile(file);
     }
   };
 
