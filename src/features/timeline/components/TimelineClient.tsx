@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { ThreadCard } from "@/src/features/thread/components/ThreadCard";
 import { ReplyModal } from "@/src/features/thread/components/ReplyModal";
 import { ImageModal } from "@/src/features/thread/components/ImageModal";
@@ -16,7 +17,11 @@ type Props = {
 };
 
 export default function TimelineClient({ initialItems, ownUserId }: Props) {
-  const { items, loading, error, refetch } = useTimeline(initialItems);
+  // useTimeline now accepts an object
+  const { items, loading, error, refetch, loadMore, hasMore } = useTimeline({
+    initialItems,
+    ownerUserId: null, // Global timeline
+  });
   const { createThread, submitReply } = useThread();
   const [openImage, setOpenImage] = useState<string | null>(null);
   const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(
@@ -91,30 +96,50 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
           </div>
         )}
 
+        {/* タイムライン */}
+        <InfiniteScroll
+          dataLength={items.length}
+          next={loadMore}
+          hasMore={hasMore}
+          scrollableTarget="scrollableDiv"
+          loader={
+            <div className="flex justify-center items-center py-6">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500" />
+            </div>
+          }
+          endMessage={
+            !loading &&
+            items.length > 0 && (
+              <div className="p-8 text-center text-gray-500 text-sm">
+                すべての投稿を表示しました
+              </div>
+            )
+          }
+        >
+          <div className="divide-y divide-gray-200">
+            {items.map((thread) => (
+              <ThreadCard
+                key={thread.threadId}
+                thread={thread}
+                onReply={handleReply}
+                onImageClick={setOpenImage}
+                isBookmarked={bookmarkedThreads.has(thread.threadId)}
+                onToggleBookmark={toggleBookmark}
+                isCompact={true}
+                currentUserId={ownUserId}
+                onDeleted={handleDeleted}
+                onReport={() => handleReport(thread.threadId)}
+              />
+            ))}
+          </div>
+        </InfiniteScroll>
+
         {/* 投稿なし */}
         {!loading && items.length === 0 && (
           <div className="text-center text-gray-500 py-20">
             投稿がありません
           </div>
         )}
-
-        {/* タイムライン */}
-        <div className="divide-y divide-gray-200">
-          {items.map((thread) => (
-            <ThreadCard
-              key={thread.threadId}
-              thread={thread}
-              onReply={handleReply}
-              onImageClick={setOpenImage}
-              isBookmarked={bookmarkedThreads.has(thread.threadId)}
-              onToggleBookmark={toggleBookmark}
-              isCompact={true}
-              currentUserId={ownUserId}
-              onDeleted={handleDeleted}
-              onReport={() => handleReport(thread.threadId)}
-            />
-          ))}
-        </div>
       </div>
 
       {/* 返信モーダル */}
