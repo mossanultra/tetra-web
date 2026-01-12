@@ -36,6 +36,9 @@ export const MarkerDetailDialog: React.FC<Props> = ({
       {/* ダイアログ */}
       <div
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
         style={{
           width: "min(300px, 80vw)",
           maxHeight: "90vh",
