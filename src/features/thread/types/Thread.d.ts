@@ -12,7 +12,7 @@ export interface Thread {
   childThreadIds: string[];
   mapPointInfoId: string | null;
   imageUrl: string | null;
-  selectDate: string | null;
+  startDate: string | null;
+  endDate: string | null;
   childThreadCount: number;
-  address: string | null;
 }

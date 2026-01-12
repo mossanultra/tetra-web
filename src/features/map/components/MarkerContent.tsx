@@ -7,25 +7,27 @@ import { Point } from "@/src/features/point/types/point";
 const MARKER_SIZE = 44;
 
 const CATEGORY_STYLE: Record<string, { bg: string; border: string }> = {
-  イベント: {
+  event: {
     bg: "#FFF0F5",
     border: "#FF6B9D",
   },
-  告知: {
-    bg: "#FFF8E1",
-    border: "#FFB800",
-  },
-  雑談: {
+  chat: {
     bg: "#E9F9F7",
     border: "#4ECDC4",
   },
 };
 
-const formatDate = (value?: string | Date | null) => {
-  if (!value) return "—";
-  const d = value instanceof Date ? value : new Date(value);
-  if (isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString(); // ← 日付のみ
+const formatEventDateRange = (startDate: string, endDate: string) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const format = (d: Date) =>
+    d.toLocaleDateString("ja-JP", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  return `${format(start)} 〜 ${format(end)}`;
 };
 
 // ========== アイコンコンポーネント ==========
@@ -62,30 +64,6 @@ const EventIcon: React.FC = () => (
   </svg>
 );
 
-const AnnouncementIcon: React.FC = () => (
-  <svg
-    width={MARKER_SIZE}
-    height={MARKER_SIZE}
-    viewBox="0 0 100 100"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden
-  >
-    <rect x="6" y="6" width="88" height="88" rx="12" fill="#FFB800" />
-    <rect x="10" y="10" width="80" height="80" rx="10" fill="#FFF4D6" />
-    <rect x="36" y="45" width="28" height="20" rx="2" fill="#FFB800" />
-    <path
-      d="M36 52 L50 60 L64 52"
-      stroke="#FFF4D6"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx="64" cy="44" r="5" fill="#FF6B9D" />
-    <circle cx="64" cy="44" r="2.5" fill="#fff" />
-  </svg>
-);
-
 const ChatIcon: React.FC = () => (
   <svg
     width={MARKER_SIZE}
@@ -106,6 +84,7 @@ const ChatIcon: React.FC = () => (
       strokeWidth="2"
       fill="none"
       strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M62 42 Q62 40 63.5 40 Q65 40 65 42 Q65 43 63.5 44.5 Q62 43 62 42 Z"
@@ -116,21 +95,27 @@ const ChatIcon: React.FC = () => (
 
 const CategoryIcon: React.FC<{ category: string }> = ({ category }) => {
   switch (category) {
-    case "イベント":
+    case "event":
       return <EventIcon />;
-    case "告知":
-      return <AnnouncementIcon />;
     default:
       return <ChatIcon />;
   }
 };
+
 export const MarkerContent: React.FC<{
   point: Point;
   onClick?: () => void;
 }> = ({ point, onClick }) => {
-  const { id, category = "雑談", threadName, imageUrl, selectDate } = point;
+  const {
+    id,
+    category = "chat",
+    threadName,
+    imageUrl,
+    startDate,
+    endDate,
+  } = point;
 
-  const style = CATEGORY_STYLE[category] ?? CATEGORY_STYLE["雑談"];
+  const style = CATEGORY_STYLE[category] ?? CATEGORY_STYLE["chat"];
 
   return (
     <div
@@ -171,14 +156,18 @@ export const MarkerContent: React.FC<{
         {/* カテゴリ */}
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <FiTag size={12} />
-          <span style={{ fontSize: 11 }}>{category}</span>
+          <span style={{ fontSize: 11 }}>
+            {category === "event" ? "イベント" : "雑談"}
+          </span>
         </div>
 
         {/* 開催日時 */}
-        {selectDate && (
+        {startDate && endDate && (
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <FiClock size={12} />
-            <span style={{ fontSize: 11 }}>開催: {formatDate(selectDate)}</span>
+            <span style={{ fontSize: 11 }}>
+              {formatEventDateRange(startDate, endDate)}
+            </span>
           </div>
         )}
 

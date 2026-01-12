@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const queryString = searchParams.toString();
     const url = `${apiBaseUrl}/inbox${queryString ? `?${queryString}` : ""}`;
+    console.log(url);
 
     const response = await fetch(url, {
       method: "GET",
@@ -22,6 +23,8 @@ export async function GET(request: NextRequest) {
         Authorization: `${session?.idToken}`,
       },
     });
+
+    console.log(response);
 
     if (!response.ok) {
       // Backend typically returns 403 if user not found, 500 otherwise.

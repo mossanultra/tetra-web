@@ -1,11 +1,19 @@
 import React, { useRef, useState } from "react";
 import { FiCalendar, FiImage, FiX } from "react-icons/fi";
 
-type Category = "イベント" | "雑談" | "告知";
+type Category = "event" | "chat";
 
 type PendingPin = {
   lat: number;
   lng: number;
+};
+
+export type ConfirmData = {
+  startDate: Date | null;
+  endDate: Date | null;
+  image: File | null;
+  url: string;
+  detail: string;
 };
 
 type PinCreationDialogProps = {
@@ -16,11 +24,14 @@ type PinCreationDialogProps = {
   savingPin: boolean;
   onThreadNameChange: (name: string) => void;
   onCategoryChange: (category: Category) => void;
-  onConfirm: (selectedDate: Date | null, selectedImage: File | null) => void;
+  onConfirm: (data: ConfirmData) => void;
   onCancel: () => void;
 };
 
-const CATEGORIES: Category[] = ["イベント", "雑談", "告知"];
+const CATEGORIES: { label: string; value: Category }[] = [
+  { label: "イベント", value: "event" },
+  { label: "雑談", value: "chat" },
+];
 
 export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
   isOpen,
@@ -34,7 +45,11 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
   onCancel,
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [url, setUrl] = useState("");
+  const [detail, setDetail] = useState("");
+
   const [imagePreview, setImagePreview] = useState<string | undefined>(
     undefined
   );
@@ -62,34 +77,54 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
     }
   };
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const date = event.target.value ? new Date(event.target.value) : null;
-    setSelectedDate(date);
+  const handleDateChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setter: (date: Date | null) => void
+  ) => {
+    const val = event.target.value;
+    const date = val ? new Date(val) : null;
+    setter(date);
   };
 
-  const formatDateForInput = (date: Date | null) => {
+  // datetime-local 用のフォーマット: YYYY-MM-DDTHH:mm
+  const formatDateTimeForInput = (date: Date | null) => {
     if (!date) return "";
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
   const handleConfirm = () => {
-    onConfirm(selectedDate, selectedImage);
+    onConfirm({
+      startDate: selectedDate,
+      endDate: endDate,
+      image: selectedImage,
+      url,
+      detail,
+    });
     // リセット
-    setSelectedDate(null);
-    setSelectedImage(null);
-    setImagePreview(undefined);
+    resetForm();
   };
 
   const handleCancel = () => {
     onCancel();
     // リセット
+    resetForm();
+  };
+
+  const resetForm = () => {
     setSelectedDate(null);
+    setEndDate(null);
     setSelectedImage(null);
+    setUrl("");
+    setDetail("");
     setImagePreview(undefined);
   };
+
+  const isEvent = category === "event";
 
   return (
     <div
@@ -129,7 +164,7 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
             marginBottom: 4,
           }}
         >
-          スレッド名
+          スレッド名 <span style={{ color: "red" }}>*</span>
         </label>
         <input
           value={threadName}
@@ -154,7 +189,7 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
             marginBottom: 4,
           }}
         >
-          カテゴリ
+          カテゴリ <span style={{ color: "red" }}>*</span>
         </label>
         <select
           value={category}
@@ -170,49 +205,159 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
           }}
         >
           {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
             </option>
           ))}
         </select>
 
-        <label
-          style={{
-            fontSize: 12,
-            color: "#555",
-            display: "block",
-            marginBottom: 4,
-          }}
-        >
-          日付
-        </label>
-        <div style={{ position: "relative", marginBottom: 12 }}>
-          <input
-            type="date"
-            value={formatDateForInput(selectedDate)}
-            onChange={handleDateChange}
-            style={{
-              width: "100%",
-              padding: "8px 10px",
-              paddingLeft: 36,
-              borderRadius: 6,
-              border: "1px solid #ddd",
-              boxSizing: "border-box",
-              color: "#333",
-            }}
-          />
-          <FiCalendar
-            style={{
-              position: "absolute",
-              left: 10,
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#666",
-              pointerEvents: "none",
-            }}
-            size={18}
-          />
-        </div>
+        {/* Date Fields - Show for Event */}
+        {isEvent && (
+          <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  fontSize: 12,
+                  color: "#555",
+                  display: "block",
+                  marginBottom: 4,
+                }}
+              >
+                開始日時 <span style={{ color: "red" }}>*</span>
+              </label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type="datetime-local"
+                  value={formatDateTimeForInput(selectedDate)}
+                  onChange={(e) => handleDateChange(e, setSelectedDate)}
+                  style={{
+                    width: "100%",
+                    padding: "8px 10px",
+                    paddingLeft: 30, // Icon space
+                    borderRadius: 6,
+                    border: "1px solid #ddd",
+                    boxSizing: "border-box",
+                    color: "#333",
+                    fontSize: "13px",
+                  }}
+                />
+                <FiCalendar
+                  style={{
+                    position: "absolute",
+                    left: 8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#666",
+                    pointerEvents: "none",
+                  }}
+                  size={16}
+                />
+              </div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  fontSize: 12,
+                  color: "#555",
+                  display: "block",
+                  marginBottom: 4,
+                }}
+              >
+                終了日時 <span style={{ color: "red" }}>*</span>
+              </label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type="datetime-local"
+                  value={formatDateTimeForInput(endDate)}
+                  onChange={(e) => handleDateChange(e, setEndDate)}
+                  style={{
+                    width: "100%",
+                    padding: "8px 10px",
+                    paddingLeft: 30,
+                    borderRadius: 6,
+                    border: "1px solid #ddd",
+                    boxSizing: "border-box",
+                    color: "#333",
+                    fontSize: "13px",
+                  }}
+                />
+                <FiCalendar
+                  style={{
+                    position: "absolute",
+                    left: 8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#666",
+                    pointerEvents: "none",
+                  }}
+                  size={16}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* URL - Show for Event */}
+        {isEvent && (
+          <>
+            <label
+              style={{
+                fontSize: 12,
+                color: "#555",
+                display: "block",
+                marginBottom: 4,
+              }}
+            >
+              URL
+            </label>
+            <input
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://example.com"
+              style={{
+                width: "100%",
+                padding: "8px 10px",
+                marginBottom: 12,
+                borderRadius: 6,
+                border: "1px solid #ddd",
+                boxSizing: "border-box",
+                color: "#333",
+              }}
+            />
+          </>
+        )}
+
+        {/* Detail - Show for Event */}
+        {isEvent && (
+          <>
+            <label
+              style={{
+                fontSize: 12,
+                color: "#555",
+                display: "block",
+                marginBottom: 4,
+              }}
+            >
+              詳細
+            </label>
+            <textarea
+              value={detail}
+              onChange={(e) => setDetail(e.target.value)}
+              placeholder="イベントの詳細を入力"
+              rows={3}
+              style={{
+                width: "100%",
+                padding: "8px 10px",
+                marginBottom: 12,
+                borderRadius: 6,
+                border: "1px solid #ddd",
+                boxSizing: "border-box",
+                color: "#333",
+                resize: "vertical",
+              }}
+            />
+          </>
+        )}
 
         <label
           style={{
@@ -315,7 +460,11 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
               color: "#fff",
               cursor: "pointer",
             }}
-            disabled={savingPin || !threadName.trim()}
+            disabled={
+              savingPin ||
+              !threadName.trim() ||
+              (isEvent && (!selectedDate || !endDate))
+            }
           >
             {savingPin ? "登録中..." : "ピンを立てる"}
           </button>

@@ -1,36 +1,58 @@
 import { apiFetch } from "@/src/utils/api";
-import { Point } from "../types/point";
+import {
+  Point,
+  CreateEventPointRequest,
+  CreateChatPointRequest,
+} from "../types/point";
 
-/** ポイント登録 */
-export async function registerPoint(
-  lat: number,
-  lng: number,
-  selectedDate: Date | null,
-  imageBase64: string | null,
-  threadName: string,
-  category: string
+/** イベントポイント登録 */
+export async function registerEventPoint(
+  req: CreateEventPointRequest
 ): Promise<boolean> {
-  if (!lat || !lng) {
-    console.warn("緯度経度を入れてください。");
-    return false;
-  }
-
   try {
     const formData = new FormData();
-    formData.append("lat", String(lat));
-    formData.append("lng", String(lng));
-    formData.append("threadName", String(threadName));
-    formData.append("category", String(category));
-    formData.append("selectedDate", String(selectedDate?.toISOString()));
-    formData.append("imageBase64", String(imageBase64));
-    const result = await apiFetch<{ success: boolean }>("/api/map", {
+    formData.append("lat", String(req.lat));
+    formData.append("lng", String(req.lng));
+    formData.append("threadName", req.threadName);
+    formData.append("category", req.category);
+    formData.append("startDate", req.startDate);
+    formData.append("endDate", req.endDate);
+    if (req.detail) formData.append("detail", req.detail);
+    if (req.url) formData.append("url", req.url);
+    if (req.imageUrl) formData.append("imageUrl", req.imageUrl);
+
+    const result = await apiFetch<Point>("/api/map/event", {
       method: "POST",
       body: formData,
     });
 
-    return result?.success ?? false;
+    return !!result?.id;
   } catch (error) {
-    console.error("Error registering point:", error);
+    console.error("Error registering event point:", error);
+    return false;
+  }
+}
+
+/** チャットポイント登録 */
+export async function registerChatPoint(
+  req: CreateChatPointRequest
+): Promise<boolean> {
+  try {
+    const formData = new FormData();
+    formData.append("lat", String(req.lat));
+    formData.append("lng", String(req.lng));
+    formData.append("threadName", req.threadName);
+    formData.append("category", req.category);
+    if (req.imageUrl) formData.append("imageUrl", req.imageUrl);
+
+    const result = await apiFetch<Point>("/api/map/chat", {
+      method: "POST",
+      body: formData,
+    });
+
+    return !!result?.id;
+  } catch (error) {
+    console.error("Error registering chat point:", error);
     return false;
   }
 }

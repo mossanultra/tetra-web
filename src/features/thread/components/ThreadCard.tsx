@@ -47,13 +47,20 @@ export const formatDate = (iso: string) => {
   return d.toLocaleDateString("ja-JP", { month: "short", day: "numeric" });
 };
 
-export const formatSelectDate = (dateStr: string) => {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+export const formatEventDateRange = (startDate: string, endDate: string) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const formatDate = (d: Date) =>
+    d.toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  return `${formatDate(start)} 〜 ${formatDate(end)}`;
 };
 
 /* ---------------- component ---------------- */
@@ -257,15 +264,17 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
             {thread.threadName}
           </div>
 
-          {/* select date */}
-          {thread.selectDate && (
+          {/* event date range */}
+          {thread.startDate && thread.endDate && (
             <div
               className={`mb-2 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full ${
                 isCompact ? "text-xs" : "text-sm"
               } font-medium border border-blue-200`}
             >
               <span>📅</span>
-              <span>{formatSelectDate(thread.selectDate)}</span>
+              <span>
+                {formatEventDateRange(thread.startDate, thread.endDate)}
+              </span>
             </div>
           )}
 
@@ -283,18 +292,6 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
                   onImageClick ? "cursor-pointer hover:opacity-95" : ""
                 } ${isCompact ? "max-h-32 rounded-lg" : "max-h-96"} transition`}
               />
-            </div>
-          )}
-
-          {/* address */}
-          {thread.address && (
-            <div
-              className={`flex items-center gap-1 mb-2 text-gray-500 ${
-                isCompact ? "text-xs" : "text-sm"
-              }`}
-            >
-              <span>📍</span>
-              <span className="truncate">{thread.address}</span>
             </div>
           )}
 

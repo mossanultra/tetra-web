@@ -11,12 +11,17 @@ import {
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useGeoLocation } from "@/src/features/geoLocation/hooks/useGeoLocation";
+import { useS3Upload } from "@/src/features/upload/hooks/useS3Upload";
 import {
   fetchPoints,
-  registerPoint,
+  registerEventPoint,
+  registerChatPoint,
 } from "@/src/features/point/hooks/usePoint";
 import { Point } from "@/src/features/point/types/point";
-import { PinCreationDialog } from "@/src/features/map/components/PinCreationDialog";
+import {
+  PinCreationDialog,
+  ConfirmData,
+} from "@/src/features/map/components/PinCreationDialog";
 import { MarkerDetailDialog } from "@/src/features/map/components/MarkerDetailDialog";
 import { SignUpPromptDialog } from "@/src/features/user/components/SignUpPromptDialog";
 import { useSignUpPrompt } from "@/src/features/user/hooks/useSignUpPrompt";
@@ -33,7 +38,7 @@ type MapWithCustomModalMarkerProps = {
   children?: ReactNode;
 };
 
-type Category = "イベント" | "雑談" | "告知";
+type Category = "event" | "chat";
 
 type PendingPin = {
   lat: number;
@@ -89,7 +94,7 @@ const usePinCreation = (
   const [pinModalOpen, setPinModalOpen] = useState(false);
   const [pendingPin, setPendingPin] = useState<PendingPin | null>(null);
   const [threadName, setThreadName] = useState("");
-  const [category, setCategory] = useState<Category>("雑談");
+  const [category, setCategory] = useState<Category>("chat");
   const [savingPin, setSavingPin] = useState(false);
 
   const { fetchLocation } = useGeoLocation();
@@ -114,47 +119,76 @@ const usePinCreation = (
     const geo = await fetchLocation(lat, lng);
     setPendingPin({ lat, lng });
     setThreadName(`${geo?.city ?? ""}${geo?.town ?? ""}`.trim());
-    setCategory("雑談");
+    setCategory("chat");
     setPinModalOpen(true);
   };
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          resolve(reader.result);
-        } else {
-          reject(new Error("Failed to convert file to base64"));
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
 
-  const confirmPlacePin = async (date: Date | null, image: File | null) => {
+  // ... (other imports)
+
+  // ... (inside usePinCreation)
+  const { uploadToS3, uploading } = useS3Upload(); // Use S3 upload hook
+
+  // ... (remove fileToBase64 function)
+
+  const confirmPlacePin = async (data: ConfirmData) => {
     if (!pendingPin) return;
 
     setSavingPin(true);
     try {
-      let imageBase64: string | null = null;
+      let imageUrl: string | undefined = undefined;
 
-      if (image) {
-        imageBase64 = await fileToBase64(image);
+      // Upload to S3 if image exists
+      if (data.image) {
+        const url = await uploadToS3(data.image);
+        if (url) {
+          imageUrl = url;
+        } else {
+          // Upload failed, stop process (alert handled in hook)
+          return;
+        }
       }
 
-      await registerPoint(
-        pendingPin.lat,
-        pendingPin.lng,
-        date,
-        imageBase64, // ← ここにBase64を渡す
-        threadName,
-        category
-      );
+      let success = false;
 
-      setPoints(await fetchPoints());
-      setPinModalOpen(false);
-      setPendingPin(null);
+      if (category === "event") {
+        if (!data.startDate || !data.endDate) {
+          alert("イベントの開始日と終了日は必須です");
+          return;
+        }
+
+        success = await registerEventPoint({
+          lat: pendingPin.lat,
+          lng: pendingPin.lng,
+          threadName,
+          category,
+          startDate: data.startDate.toISOString(),
+          endDate: data.endDate.toISOString(),
+          detail: data.detail,
+          url: data.url,
+          imageUrl,
+        });
+      } else {
+        // Chat
+        success = await registerChatPoint({
+          lat: pendingPin.lat,
+          lng: pendingPin.lng,
+          threadName,
+          category,
+          imageUrl,
+        });
+      }
+      // ...
+
+      if (success) {
+        setPoints(await fetchPoints());
+        setPinModalOpen(false);
+        setPendingPin(null);
+      } else {
+        alert("ピンの作成に失敗しました");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("エラーが発生しました");
     } finally {
       setSavingPin(false);
     }
