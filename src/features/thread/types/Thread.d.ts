@@ -1,4 +1,4 @@
-export interface Thread {
+interface ThreadItemCommon {
   threadId: string;
   threadName: string;
   createdAt: string;
@@ -11,8 +11,25 @@ export interface Thread {
   parentThreadId: string | null;
   childThreadIds: string[];
   mapPointInfoId: string | null;
-  imageUrl: string | null;
-  startDate: string | null;
-  endDate: string | null;
   childThreadCount: number;
 }
+
+export interface ThreadItemEvent extends ThreadItemCommon {
+  category: "event";
+  categoryContent: {
+    startDate: string;
+    endDate: string;
+    detail: string | null;
+    url: string | null;
+    imageUrl: string | null;
+  };
+}
+
+export interface ThreadItemChat extends ThreadItemCommon {
+  category: "chat";
+  categoryContent: {
+    imageUrl: string | null;
+  };
+}
+
+export type Thread = ThreadItemEvent | ThreadItemChat;

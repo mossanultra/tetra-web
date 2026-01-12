@@ -65,9 +65,9 @@ const ThreadCard = ({ thread, index }) => {
           {thread.threadName}
         </h3>
 
-        {thread.imageUrl && (
+        {thread.categoryContent?.imageUrl && (
           <img
-            src={thread.imageUrl}
+            src={thread.categoryContent.imageUrl}
             alt={thread.threadName}
             className="w-full h-16 sm:h-20 object-cover mb-2 border-2 border-white shadow-sm"
           />
@@ -84,9 +84,9 @@ const ThreadCard = ({ thread, index }) => {
           </span>
         </div>
 
-        {thread.selectDate && (
+        {thread.categoryContent?.startDate && (
           <div className="text-xs text-gray-600 border-t border-gray-300 pt-2">
-            📅 {formatDate(thread.selectDate)}
+            📅 {formatDate(thread.categoryContent.startDate)}
           </div>
         )}
       </div>

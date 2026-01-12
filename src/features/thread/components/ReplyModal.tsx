@@ -36,9 +36,9 @@ export const ReplyModal: React.FC<ReplyModalProps> = ({
             </span>
           </div>
           <div className="text-gray-900 text-sm">{replyTarget.threadName}</div>
-          {replyTarget.imageUrl && (
+          {replyTarget.categoryContent.imageUrl && (
             <img
-              src={replyTarget.imageUrl}
+              src={replyTarget.categoryContent.imageUrl}
               alt="元の投稿画像"
               className="mt-2 rounded-xl max-h-40 object-cover"
             />

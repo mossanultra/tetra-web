@@ -137,11 +137,6 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
     onToggleBookmark?.(thread.threadId);
   };
 
-  const handleImageClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onImageClick?.(thread.imageUrl!);
-  };
-
   const handleMenuToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu((v) => !v);
@@ -180,6 +175,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
 
   /* styles */
 
+  const isEvent = thread.category === "event";
   const avatarSize = isCompact ? "w-10 h-10" : "w-12 h-12";
   const textSize = isCompact ? "text-sm" : "text-[15px]";
   const nameSize = isCompact ? "text-sm" : "";
@@ -188,10 +184,20 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
   return (
     <article
       onClick={navigateToThread}
-      className={`relative px-4 py-3 hover:bg-gray-50 transition cursor-pointer ${
+      className={`relative px-4 py-3 transition cursor-pointer ${
         isChild ? "ml-10 border-l border-gray-300" : ""
+      } ${
+        isEvent
+          ? "bg-amber-50/40 hover:bg-amber-50 border-1 border-l-4 border-l-amber-400 border-amber-100" // イベント用スタイル
+          : "hover:bg-gray-50 bg-white" // 通常スタイル
       } ${cardOpacity}`}
     >
+      {/* Event Badge */}
+      {isEvent && (
+        <div className="absolute top-0 right-0 px-2 py-0.5 bg-amber-400 text-white text-[10px] font-bold tracking-wider rounded-bl-lg shadow-sm z-10">
+          EVENT
+        </div>
+      )}
       <div className="flex gap-3">
         {/* -------- Avatar -------- */}
         <Image
@@ -265,29 +271,72 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
           </div>
 
           {/* event date range */}
-          {thread.startDate && thread.endDate && (
-            <div
-              className={`mb-2 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full ${
-                isCompact ? "text-xs" : "text-sm"
-              } font-medium border border-blue-200`}
-            >
-              <span>📅</span>
-              <span>
-                {formatEventDateRange(thread.startDate, thread.endDate)}
-              </span>
-            </div>
+          {thread.category === "event" && (
+            <>
+              {/* event date range */}
+              <div
+                className={`mb-2 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full ${
+                  isCompact ? "text-xs" : "text-sm"
+                } font-medium border border-blue-200`}
+              >
+                <span>📅</span>
+                <span>
+                  {formatEventDateRange(
+                    thread.categoryContent.startDate,
+                    thread.categoryContent.endDate
+                  )}
+                </span>
+              </div>
+
+              {/* detail */}
+              {thread.categoryContent.detail && (
+                <div
+                  className={`text-gray-600 mb-2 ${
+                    isCompact
+                      ? "text-xs line-clamp-4 whitespace-pre-wrap"
+                      : "text-sm whitespace-pre-wrap"
+                  }`}
+                >
+                  {thread.categoryContent.detail}
+                </div>
+              )}
+
+              {/* url */}
+              {thread.categoryContent.url && (
+                <div className="mb-2">
+                  <a
+                    href={thread.categoryContent.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className={`text-blue-500 hover:underline flex items-center gap-1 truncate ${
+                      isCompact ? "text-xs" : "text-sm"
+                    }`}
+                  >
+                    🔗 {thread.categoryContent.url}
+                  </a>
+                </div>
+              )}
+            </>
           )}
 
           {/* image */}
-          {thread.imageUrl && (
+          {thread.categoryContent.imageUrl && (
             <div className="relative mt-3 mb-2 w-9/12">
               <Image
-                src={thread.imageUrl}
+                src={thread.categoryContent.imageUrl}
                 alt="投稿画像"
                 width={800}
                 height={600}
                 unoptimized
-                onClick={onImageClick ? handleImageClick : undefined}
+                onClick={
+                  onImageClick
+                    ? (e) => {
+                        e.stopPropagation();
+                        onImageClick(thread.categoryContent.imageUrl!);
+                      }
+                    : undefined
+                }
                 className={`rounded-2xl object-cover border border-gray-200 ${
                   onImageClick ? "cursor-pointer hover:opacity-95" : ""
                 } ${isCompact ? "max-h-32 rounded-lg" : "max-h-96"} transition`}
