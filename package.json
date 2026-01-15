@@ -11,6 +11,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.940.0",
     "@react-google-maps/api": "^2.20.7",
+    "firebase": "^12.8.0",
     "next": "^16.0.7",
     "next-auth": "^5.0.0-beta.30",
     "react": "19.2.0",
