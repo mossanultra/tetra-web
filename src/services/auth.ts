@@ -12,8 +12,6 @@ async function refreshTokens(token: JWT): Promise<{
   idToken: string;
   refreshToken?: string;
 } | null> {
-  console.log("Attemping to refresh tokens...");
-
   if (!token.refreshToken) {
     console.error("No refresh token available");
     return null;
@@ -181,7 +179,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           }
         }
         token.userName = cognitoUsername;
-        console.log("Initial JWT callback. userName:", token.userName);
 
         return token;
       }
@@ -211,7 +208,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       // トークンをリフレッシュ
       try {
-        console.log("Token expired. Calling refreshTokens...");
+        // console.log("Token expired. Calling refreshTokens...");
         const newTokens = await refreshTokens(token);
 
         if (newTokens) {

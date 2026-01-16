@@ -56,10 +56,6 @@ async function refreshAccessToken({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log("[refresh-token API] Request body:", {
-      hasRefreshToken: !!body.refreshToken,
-      hasUserName: !!body.userName,
-    });
 
     if (!body.refreshToken || !body.userName) {
       return NextResponse.json(
@@ -75,10 +71,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(newTokens);
   } catch (err) {
-    console.error(
-      "[refresh-token API] Failed to refresh:",
-      JSON.stringify(err, null, 2)
-    );
+    console.error("Failed to refresh:", err);
     return NextResponse.json({ error: "Refresh failed" }, { status: 500 });
   }
 }
