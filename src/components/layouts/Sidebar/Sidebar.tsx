@@ -11,7 +11,9 @@ import {
   FaSignOutAlt,
   FaUser,
   FaEnvelope,
+  FaBug,
 } from "react-icons/fa";
+import useFcmToken from "@/src/hooks/useFcmToken";
 import { useProfile } from "@/src/features/user/hooks/useProfile";
 import { useInboxSummary } from "@/src/features/inbox/hooks/useInboxSummary";
 import {
@@ -39,6 +41,7 @@ export default function SidebarNavigation({ open, onClose }: Props) {
   const { data: profile } = useProfile();
   const { getLoginMode } = useLoginMode();
   const [isGuest, setIsGuest] = useState<boolean>(true);
+  const { requestPermission } = useFcmToken();
 
   useEffect(() => {
     const checkMode = async () => {
@@ -117,7 +120,17 @@ export default function SidebarNavigation({ open, onClose }: Props) {
         </nav>
 
         {/* Bottom Actions */}
-        <div className="mt-auto border-t border-neutral-800 pt-4">
+        <div className="mt-auto border-t border-neutral-800 pt-4 space-y-1">
+          <button
+            onClick={async () => {
+              await requestPermission();
+              alert("FCMトークンをバックエンドへ送信しました");
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-400 hover:bg-neutral-800 hover:text-white transition-all duration-200"
+          >
+            <FaBug size={20} />
+            <span className="text-sm font-medium">FCMトークン送信(Debug)</span>
+          </button>
           <Link
             href="/signout"
             onClick={onClose}
