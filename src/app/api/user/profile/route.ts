@@ -35,7 +35,7 @@ export async function PUT(request: NextRequest) {
     console.error("User API error:", error);
     return NextResponse.json(
       { error: "Failed to update user data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -57,16 +57,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to create exercise: ${response.status}`);
+      const errorText = await response.text();
+      console.error("Backend Error Response:", errorText);
+      throw new Error(
+        `Failed to create profile: ${response.status} ${errorText}`,
+      );
     }
 
     const createdExercise = await response.json();
     return NextResponse.json(createdExercise);
   } catch (error) {
-    console.error("Training query API error:", error);
+    console.error("profile API error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch training data" },
-      { status: 500 }
+      {
+        error: "Failed Create Post",
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 },
     );
   }
 }

@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { auth } from "./services/auth";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-export type UserCheckResult = "ok" | "unauthorized" | "undefined" | "failed";
+export type UserCheckResult = "ok" | "unauthorized" | "not_found" | "failed";
 
 async function getProfile(token: string): Promise<UserCheckResult> {
   if (!token) return "unauthorized";
@@ -19,6 +19,8 @@ async function getProfile(token: string): Promise<UserCheckResult> {
     });
     if (res.status === 200) {
       return "ok";
+    } else if (res.status === 404) {
+      return "not_found";
     } else {
       console.error("Error checking user:", res.status, res.statusText);
       return "failed";
@@ -42,6 +44,8 @@ async function getUser(token: string): Promise<UserCheckResult> {
     });
     if (res.status === 200) {
       return "ok";
+    } else if (res.status === 404) {
+      return "not_found";
     } else {
       console.error("Error checking user:", res.status, res.statusText);
       return "failed";
@@ -101,6 +105,11 @@ export async function middleware(req: NextRequest) {
       // ユーザーが存在するかチェックする
       const isUser = await getProfile(session.idToken!);
       if (isUser === "failed") {
+        console.log(
+          "[Middleware] Not Found User or Unauthorized. Redirecting to /login-prompt"
+        );
+        return NextResponse.redirect(new URL("/new-user", req.url));
+      } else if (isUser === "not_found") {
         console.log(
           "[Middleware] Not Found User or Unauthorized. Redirecting to /login-prompt"
         );

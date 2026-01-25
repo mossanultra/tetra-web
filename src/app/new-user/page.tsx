@@ -36,7 +36,7 @@ const NewUserPage = () => {
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setUserData({
@@ -45,7 +45,7 @@ const NewUserPage = () => {
     });
   };
   const handleUrlChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setUserData({
@@ -84,13 +84,30 @@ const NewUserPage = () => {
       const userCreateEndpoint = `/api/user`;
       const endpoint = `/api/user/profile`;
 
-      await fetch(userCreateEndpoint, {
-        method: "POST",
+      const checkUserResponse = await fetch(userCreateEndpoint, {
+        method: "GET",
         headers: {
-          "Content-Type": "application/json",
           Authorization: token,
         },
       });
+
+      if (checkUserResponse.status === 404) {
+        await fetch(userCreateEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+      }
+
+      const payload = {
+        userName: userData.nickname,
+        introduction: userData.bio,
+        imageUrl,
+        url: userData.url,
+      };
+      console.log("Sending profile update payload:", payload);
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -98,29 +115,24 @@ const NewUserPage = () => {
           "Content-Type": "application/json",
           Authorization: token,
         },
-        body: JSON.stringify({
-          userName: userData.nickname,
-          introduction: userData.bio,
-          imageUrl,
-          url: userData.url,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          errorData.message || `エラーが発生しました (${response.status})`
+          errorData.message || `エラーが発生しました (${response.status})`,
         );
       }
 
       setShowSuccess(true);
       setTimeout(() => {
-        window.location.href = "/login-prompt";
+        window.location.href = "/timeline";
       }, 3000);
     } catch (err) {
       console.error("エラー詳細:", err);
       setError(
-        err instanceof Error ? err.message : "予期せぬエラーが発生しました"
+        err instanceof Error ? err.message : "予期せぬエラーが発生しました",
       );
     } finally {
       setIsLoading(false);
