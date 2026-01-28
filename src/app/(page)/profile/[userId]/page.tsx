@@ -42,6 +42,16 @@ const ProfilePage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, isGuest]);
 
+  if (isGuest === null) {
+    return (
+      <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8 animate-pulse">
+        <div className="mb-8 text-center">
+          <div className="h-10 bg-gray-200 rounded w-48 mx-auto mb-2"></div>
+        </div>
+      </div>
+    );
+  }
+
   if (isGuest === true) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
