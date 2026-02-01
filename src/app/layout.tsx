@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ProfileProvider } from "@/src/contexts/ProfileContext";
+import { InboxProvider } from "@/src/contexts/InboxContext";
 import FCMHandler from "@/src/components/FCMHandler";
 
 const geistSans = Geist({
@@ -47,8 +48,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ProfileProvider>
-          <FCMHandler />
-          {children}
+          <InboxProvider>
+            <FCMHandler />
+            {children}
+          </InboxProvider>
         </ProfileProvider>
       </body>
     </html>

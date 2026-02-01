@@ -233,6 +233,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
             {/* menu */}
             <div className="relative" ref={menuRef}>
               <button
+                aria-label="メニュー"
                 onClick={handleMenuToggle}
                 disabled={isDeleting}
                 className="p-2 rounded-full hover:bg-gray-200 transition text-gray-500 hover:text-gray-700 disabled:opacity-50"
@@ -350,6 +351,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
             <div className="flex items-center gap-6 mt-3 text-gray-500">
               {onReply && (
                 <button
+                  aria-label="返信"
                   onClick={handleReply}
                   className="flex items-center gap-2 group hover:text-blue-500 transition"
                 >
@@ -373,6 +375,9 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
 
               {onToggleBookmark && (
                 <button
+                  aria-label={
+                    isBookmarked ? "ブックマークを解除" : "ブックマーク"
+                  }
                   onClick={handleBookmark}
                   className={`flex items-center gap-2 group transition ${
                     isBookmarked ? "text-blue-500" : "hover:text-blue-500"

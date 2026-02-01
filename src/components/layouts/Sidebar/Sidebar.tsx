@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa";
 import useFcmToken from "@/src/hooks/useFcmToken";
 import { useProfile } from "@/src/features/user/hooks/useProfile";
-import { useInboxSummary } from "@/src/features/inbox/hooks/useInboxSummary";
+import { useInboxContext } from "@/src/contexts/InboxContext";
 import {
   useLoginMode,
   LoginMode,
@@ -51,7 +51,7 @@ export default function SidebarNavigation({ open, onClose }: Props) {
     checkMode();
   }, [getLoginMode]);
 
-  const { unreadCount } = useInboxSummary({ enabled: !isGuest });
+  const { unreadCount } = useInboxContext();
 
   // 外側クリックで閉じる
   useEffect(() => {

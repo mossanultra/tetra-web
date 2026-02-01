@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { InboxMessage } from "../types/Inbox";
+import { InboxMessage, InboxResponse } from "../types/Inbox";
+import { useInboxContext } from "@/src/contexts/InboxContext";
 import { getInboxMessages } from "../api/getInboxMessages";
 import { markMessageAsRead as apiMarkAsRead } from "../api/markMessageAsRead";
 import { markAllMessagesAsRead as apiMarkAllAsRead } from "../api/markAllMessagesAsRead";
@@ -17,6 +18,9 @@ export const useInbox = (options?: { enabled?: boolean }) => {
   const [hasMore, setHasMore] = useState(false);
   const LIMIT = 10;
 
+  // Use global context to refresh summary (badge count)
+  const { refreshSummary } = useInboxContext();
+
   const fetchMessages = useCallback(
     async (currentOffset: number, isLoadMore: boolean = false) => {
       try {
@@ -31,7 +35,7 @@ export const useInbox = (options?: { enabled?: boolean }) => {
           // 重複排除 (念のため)
           setMessages((prev) => {
             const newMessages = data.messages.filter(
-              (newMsg) =>
+              (newMsg: InboxMessage) =>
                 !prev.some((msg) => msg.messageId === newMsg.messageId),
             );
             return [...prev, ...newMessages];
@@ -68,6 +72,12 @@ export const useInbox = (options?: { enabled?: boolean }) => {
   const markAsRead = useCallback(async (messageId: string) => {
     try {
       setIsMarking(true);
+      // Optimistic update
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.messageId === messageId ? { ...msg, isRead: true } : msg,
+        ),
+      );
 
       // Optimistic update
       setMessages((prev) =>
@@ -105,7 +115,7 @@ export const useInbox = (options?: { enabled?: boolean }) => {
     } finally {
       setIsMarking(false);
     }
-  }, [fetchMessages]);
+  }, [fetchMessages, refreshSummary]);
 
   const deleteMessage = useCallback(
     async (messageId: string) => {
