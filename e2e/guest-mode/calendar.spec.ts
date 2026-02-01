@@ -23,11 +23,22 @@ test.describe("Guest Mode - Calendar", () => {
     // react-calendar tiles have class 'react-calendar__tile'
     // We click the 'now' tile if available, or just the first enabled tile
     const nowTile = page.locator(".react-calendar__tile--now");
+    // Add logic to handle visibility check safely
     if (await nowTile.isVisible()) {
-      await nowTile.click();
+      await nowTile.click({ force: true });
+      await page.waitForTimeout(300); // Wait for first click to register
+      await nowTile.click({ force: true });
     } else {
-      await page.locator(".react-calendar__tile").first().click();
+      const tile = page.locator(".react-calendar__tile").first();
+      await tile.click({ force: true });
+      await page.waitForTimeout(300); // Wait for first click to register
+      await tile.click({ force: true });
     }
+
+    // Wait for the selection message to disappear to ensure the click worked
+    await expect(
+      page.getByText("カレンダーから期間を選択してください"),
+    ).not.toBeVisible();
 
     // Wait for loading or results
     // If no threads, it shows "選択期間にスレッドが見つかりませんでした"
@@ -50,7 +61,19 @@ test.describe("Guest Mode - Calendar", () => {
     // Attempt to select a date (maybe iterate or pick one with data if we knew)
     // Just picking 'now' for simplicity
     const nowTile = page.locator(".react-calendar__tile--now");
-    if (await nowTile.isVisible()) await nowTile.click();
+    if (await nowTile.isVisible()) {
+      await nowTile.click({ force: true });
+      await nowTile.click({ force: true });
+    } else {
+      await page
+        .locator(".react-calendar__tile")
+        .first()
+        .click({ force: true });
+      await page
+        .locator(".react-calendar__tile")
+        .first()
+        .click({ force: true });
+    }
 
     const threadCards = page.locator("article");
     if ((await threadCards.count()) > 0) {

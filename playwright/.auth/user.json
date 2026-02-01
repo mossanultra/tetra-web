@@ -1,0 +1,109 @@
+{
+  "cookies": [
+    {
+      "name": "authjs.callback-url",
+      "value": "%2Fmap",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "lang",
+      "value": "ja",
+      "domain": "tetra-poc-338880795815.auth.ap-northeast-1.amazoncognito.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "csrf-state",
+      "value": "\"\"",
+      "domain": "tetra-poc-338880795815.auth.ap-northeast-1.amazoncognito.com",
+      "path": "/",
+      "expires": 1769951122.829902,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "csrf-state-legacy",
+      "value": "\"\"",
+      "domain": "tetra-poc-338880795815.auth.ap-northeast-1.amazoncognito.com",
+      "path": "/",
+      "expires": 1769951122.829975,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "XSRF-TOKEN",
+      "value": "65730d20-57d2-4e95-a4cf-caed84ebe5b9",
+      "domain": "tetra-poc-338880795815.auth.ap-northeast-1.amazoncognito.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "cognito",
+      "value": "\"H4sIAAAAAAAAAAHoABf/T4sukbVQpQrgej+irWBcgeRxCIUBxEblR06hzeKlQ5VheErbrJXfoA5cpmcdWlazZ/S01VgI1aNXRRZJc9kH7AeCtufNIIXgpOeA4SHCswcWhSO3KhqHvizHfNl0Bm4lHGENP5+BX0AgJf+ZS2Y6XSqux9x6Tn4cVpQ8vzsYrngW5lyDLKvV0ftkVSwUgS/RTjQvRC1D6ENpus+YrRhI3q621Hf8ylCM38O3qoFdutGibRHcqSRcQbeA4euM2u5pyAk5ZchlbEvwzwzExGkC1MM/fTETOKL6P7YfYmxGh8sPy7juq8buXP+gWZjoAAAA.H4sIAAAAAAAAANuXy65er7KvllVGqOKT+9umiZMOMz/wP/Zwb9HXY/Ha7QcBm5b3GSAAAAA=.3\"",
+      "domain": ".tetra-poc-338880795815.auth.ap-northeast-1.amazoncognito.com",
+      "path": "/",
+      "expires": 1769954435.453068,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "authjs.csrf-token",
+      "value": "9a447cef4fb119bb7cecffe623349d6c4e275971aeb7906bdecce7dec154a530%7Cccd82759aa75bcf2c2a8a44e9dfead8befa1a71c4084134928ee3c0e9ade9612",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "authjs.session-token.0",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiZWF2XzhVVktqd1VmOWF2eXpYMXU4bmdtWFFLTFE3bFFWTG1EZEowem9hVFpTRDlIRUVVRUVWTExUQ0l3NnppcGw4UzVwWU5jT05PMWZmalk5ZW9Lb3cifQ..VNcAEl59eNHRgDM2ZS6ukQ.nxXwtJnht3SV09a96ceojSdG2KUArLC8oqriif0PMJ95mT9haMApjfGChYkj-AcktTO1gC_EwXW5qhWHyE-dzjPbXZSRrwEIhrud7veYk-xBWAQUNLwC_qjChSKeF7aN1090_IonAycCDxOr4X--gC73XL8tAGBtrN8QIvmG8Gt9do8ps9Ne_6cLaVirq3VexO9whN4MJ4k4Jc2LqjxdhUA0K-Hz0JpklMGKOJ_8EoHaexXKEAKzyFvng8G1rHjfd8IsY1HvoAevbTP2_DWkThh4qHxQHecJ-nfAaC8Q39ld7IWYvHPgyMK_oslBaKjVNn1OEeRi-gbAj1OptNWy3UlcBiAEkyX9Sjf6HBCej4p2udKayHt7GFm2G5YKhoj8fOxgUaHM4tTmHBQ_mxpngx7v-zt1FiCTvkr9M7hSk2GspbbFfDDpfevLMJMpJbXn2HtfdtrXNkxHRUOfayuh_f9Oy7Jv1Fzn-NFCCYwIs7p-RP69NbGPQfDHMgUqmg7jeSlBFr-1XUzYrvQcdhfKfSnomREYSvbVFeOLS_mapmILa7rujQxCzrBaHgwgnoxMiOhsWo-7gDhrrH_Hxpo_a-S5Sycqs0DkH4fDSEA1jBZBMoyT5V9h-Z0WUajEJ7aXsZUEAcgy4O8fy-el0rL1HQDtVDeVrdp-Nl4sELPLT5qKbdBp5N4ucjxb7lKGxrrrlavayvNIFBBccHD-WKg4IGo8VswpcBEPJtokGQmNcoPUWwrrXTRM-C0KgdMaDUWj6GtLm_-Emeu9fZXOvMAeWo8L8QzikzSS3CXRCl4p2E6cm6cOrhyetD5H2YXXHREqMXcVOkUUt_ReIhVELgOHXEaj8xqIEC1zaqVjtb_-gAcQGwpyti150XbRwQBLHuKtFZ-wGK4C97GNu_AHKNK2iilJfhQudum4FqJKFxrq_C5q3RKECxkNXDzriOg2pwfUBKsNom--LsW6jMwRy-Y6NMRc9mKqrqWTHryuxK3CmHv_6dMKPnfHua4NIS-C-TOwE3N4ZtVEAqxQ_t-UKkwZJHxPbeZi4EO1oHRS498tVhKfPJ8yL-5god1U-ZBHC1qpbwOcOdGPYBde9WaUooZPytbTFd50FcZoMxkukqJ9il1LW-L5cc1rOt4Nc_UteAHw3zc6V3hIaIxDCF5Pv-AEFku00XFLCt_Rkrxd2fd3gU7LoFQ_NW_teuy552DnEaP8d3m9COGRTji4BTb9p-tGsGGwwvTgNrIIyK6fAEfD4DdjY21nOLDBjDL6NJ8AtdFywZ263QEqkuS6O2905iUhgXGl80mYXysyFRgL0J3_qBMpBwCvikoCnYTGXk9BaazvC6XsVebxUE0XKmC-WH_l3xR6dJWhw4RL5PyhKU_7_2CR5QQUcVl_tynIeZqruI0RufvIvACBEPlhG_bZXIi2FhG1FguYDj_dEDguGVj9H1l-XXQl-5yPwyXwQgo3I4MMNM5yeRuM1CELvY3o0VvRyyF1Y04g8XEpcP5nSznWzeg7P2mYz99yOXgo0bq7EENvOxnNkII4xXiEmzOZ8t294I8C8aQNgxDdz3rnrEaYl7Qvoxze8a8Csozbv1G761kaL-YPwG7tTwTW61ynXZANY_a_GF4ug9--s8Zwyy6ARha4-2KU8QModzKmX4SQn3n_dR3jXVx_ZcF4f4suJNZxx9lZvRp1KmTl55_LLXImObITGKAyOWLAEAVFqxUO2CjdFd0kTaWdC_rw7HBWQiRyPd3W5LIGV7rD46LSzP-es3HMNftAYgwvxUy7AbzHGoIc2ASNxF851QPmUQKzJZRQnx217Yhh1W1Ly6ybD21yRaJELB8waBjIImNJP5nY797UoKk9AIYkjiZX9hs8IaxuYUjkPF3YoJXHZVSlKAVNd7jARTyUnQTKZ1x1jRCUWNiuI5DHpF0h_ORnY0VBCCXN_PtfpdTcjBzCSDJkiTr-qvlMrGFyDqgaqy88Pqj8_aWe-V2sbru9saasGN6tvH94LrIMIo9bhd6k26HepYgwB2N4I4xDYBfA6SQ0-el0bJYGV1Tor1HALwIqqa0rXy2PCH_9JvQeW6FbX83XKSrW8peknqeJYX0QRYHeswi4AgK5UfpsbEUy7NLGQXszu7EumJu_hwot5fE6VVANEej9vlw9VnDUCQ3G7xju1L1dZvMfyDdc6m-3XTjl-Nnd6WxPnutJsMgu42u_DmIJRW4nKzwd0ZnKs0nkbY7A-U9mSqPzHhGsbJMHx4stRqbDYaZNpQfeEcyW0nKisPT23JWQ_F8TEuFw6cuS5niw_43_dos_zS4b5BwVP3ls3c7Fm9eGXo6JDMLumBsIxk0tWOFYdncMkg3nCOYiRO4lv-uO_j5KROXZ2__DsVC2w-GsxzX4Fn6QZ0_0Mf4582vuW577A573ogFpljX9oPI8TxvmfGX9gIGwDb61qWqyk9bB1pBStJgwIbRGaO1CnmK-9fsO_nl5AVqxxZdZ82mBKUrj93qxbaoYWseE5XkVQ4PF4OdVVTu7l_TwMY1TL4oNKYHGwcOnrbuV_nr3JajfBzNCBvwrP-JHwvUeDq7g3YkClhZpLEXr0DPNFH7b33FzOgut18tgdfjIPQmuhehXW4-p_jULf_B5pK6KKXAiJFjF7nIjRNrBgpiHB51iMuqq7qz_PJbbfVNi99lXu45dGMiCi5YqBiF7QUw9jKZRWKYjjLj2gwrRWU42tZZxslViO8XZFRGGQyJuX3fjyTiUpbt9PyLKdaFkK52VJgks8UZM3z6hv89z8BdWhf7qRHi4l4mSSo435b5E7CPNG6SBvXp9EpTGFheQ2PtamP0EeEPwmfTMRY7iyZ_6ye5HX5QCKY5i1TdAjOjppT-2LZO5SBfYrVizsV-5GK05_gduKq1tJ5piKI2bBgaS8USTqyKCu76sj7oGHTNIuwiBye8rsgbC7sV6KrJWXcY0guF69zv8AzWGOyqq6zUrJm6z6yBkAaK9dpn92IOk9Bsij7gQvlh_hNa2-kgvTzTMpjnmYtl8MKTL-qsLD4i3QaV2pbjQstTtYDg_OeNnT_44iwOuJNqR7njS2UBBwrfiNsfQlVSngtVrJNwREamTg0s3OSqr1xLS6iT8dReEroZ7rtefbYVCUUFUaix8rMz983coUDmFJ-0GJxlHGGLUpZPcPet2IvDoibgu96S7kXaTw4T4_hmh5I-LUOfU-KmMZ4P2bzZWZo7Dycm4DfIGw6UKQplRdO_fwKjRF-0LIDuukGrFis51O713wTR0diYwu2q_qbuIwbf247T9PtLbXpANRF8NhWlEzY3C0vlmE9uNewnWIWw3OO4o1UDdczyflJLYXIw1F5j2vJQqeC5iyuZsfJaFWewqV_oVzr-R-eIRJV-NC-ShLvAPpfVi7FoMzVT_pmpDrRds2DZInjo1rUROupoGxlU5S0rDE2LDtOWCXTQUgwXI4xIfivmpoCwd3WhSoGIcy08N2rIU9N1zrVtrPAK87CMr8yqv0ehBzDUHGc5_qBoJIio23VW4Trlm2VuZbK6xbDKLa8dtCYxNnAD0IBXe6z3C6tv1ibShA9tc0NkbSzNy2fTyvsEOVRBeBDQ7ofyTmwKP5RAFVKXVIgRTPjqMyXoOx1V0z11G25X1nVgzxRhFxk5PA-ghvc5Ca-QDVy1qpj2_IYDQbf1nd9EIKlUbOJ_EeHSUE-_TlGGU262AlxKsUsHgzjgVrlBD14UWiUfZcHIbD9VBs",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1772542836.162651,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "authjs.session-token.1",
+      "value": "FrmgWktyBGWhTrWdNR9Jq_VYyOP4nCeVa0mbZAIHb4zhaqmMmSBbwPxrBM2MPcfAMDIXz8kwB9LTbOc6o-QgjeZn-PHgfVLkIH0AyY9EcShDaL3MtPpR2jk0kwJDl9XPacLtQiXza3f624h9IX5jh97JvG0KIJn5roTEHZxmuOSki6EjcKZf5jbqnYRx3jjAzOFJlyEmm2Ix4x9d-XAa28DNTSP-lX5Kx2ctQMMcUcwM94LQarRudIQpP7ScI_F9VGHmMMNltLKCdSQb-TgAVHxJHlV8jIJrJFbSvJMWoIHpFNENiV9OYHmgALEfQ3QmFlmEVyQNSsybZ96qHt82w2k9Q1OsZ5xWuKEk6i3uoyds9lf20PTkWFs4Cexlsl4eP0rdi63xoj54uJg3R0eddH4uZJGgT-ktg-6hm34RNvxbuQp6iYFwGKqmOC4W59gl1PH_vNPM6hoQUiGyrtT2Z-jv0u580GwhQRB893NiSJKTG4-C0X5VVtRgQRetmjo5zoCnHxsf_hpFGWYoYAx1eN1kJQ8fDZgSNJQnvacGZRH0rHjVZ_k3yAC1ZNbKBcXl5vwPgHHypHSsp8o7QHuyTBHZeWJTquILvxADHCC11b4-k7k0nwEZT9_CHW_KbKb8_QytDkHDxrKUdGMEOIdH-pRrJaEFAXh5Yt4igfv8BNkNWeIrRnDwoM36DTxZI0oZ7C_uo0kc7kAM8oOyMtdC4js4xnzwFPKs6dCvqwdWWwInjlS8qcvjgaEed6iZeZW77pBIK3UsP7651WHtxdGI3CJZw6ONUfdyNJjDaMQMpxvIaPDNcdOC2mXUATt88GYgrBcrHwyNO-hCz4GU0PVyeqR7VUhshyHAcJnzJrudzu5JT-EFr9TfwQzrmls0FUSj439pOKBTMqQaN0GD5Ifo7aRKb3R1gDI0lDLrbd4Ptpy3rAsTfT9fsahowO9KszJHwc3sGXYlaApCBP_gW9FtP0_IBUc7bifdY13tfio10JG4ek0EYCNO_c2HwZ5Tjo1Kdi_Wr4IArZ4tad1ztx2nfMfCo7cNDYjpOAz9blEyZLC8jHrgmvme0SqPeYtBi_prlSy38SW8mvraq38i2Yy2y5PNJ5YwOCLCObxkkyYUBdxF8lJwAFItIiymCEhTzaa0v686Yiwbtkxvr9dUlKqTRFm_kWdUZi-BTMELlX2gY-jxSqmvx7w8A4K9xL63UITESkSLBelfxEQnRoVzT8IeidBklPeykOL6qGKFXEt115U-Wtqh8K1JeqXdcF8-f6jERtJk43MBoqE15W6iAhzW73VgogugNJm24BkHZVuQ2X_DaOzWs5N542AGfyAZdM7BtJ4fJ3KjPLPZHtx4Ya2sM1uUGX8PsZ37NXyrAJsXHNgF1OC8QfqFDHHH8Vo4kF1FT6mBXFk60UAEAvACdz53ik-2QvnVicT98rlSogpIUNuA6JDxzpDk_N5XVSb39K7qzmi1FDijhBXt6yh_mXHbojp0EmFraJ_7qm11HAiPXG-U5LxktK3K2ty49K6DTBXzzda4XS1HCfSyiL9_T9HVGah6bMJUccBFhzq1B0snNhQrFCYxO1SU7ewtgkfrq2nphPNC1ScnJVDsI9Urr0uC9SXvmH6elvB3Pxhiw0sP_f7DU5VdQ72X07vJwIkFzFu-OmuaY3gaIfku75--xK9QC-BypMHbtdytIJwtJ1zjHjL-A2NAuB9sCeS1BlbTS_CejrrsDGgy_B80pxOTffraRbJpe4M0_RLX0Nh8tN5TUC-7LQnWUADSY4gA_qCmGoN2YG8U--rnJQBx2fHaI3rXl2J54mHs4cO2qxoeokN0Xi4wCJ0yv4YmIL2Mwf6HA0dg0Z7imeNtoEAZberko12MyJjDGG3INrLoxDBzd-4sLDrsAJJ_DgnQqzyyjDjZP02aO37TZ6HtTar2IqMWZeimYK4HLtyBaNwGlw-hdK_LoeHzw3d7HHa53rx5ZVjoEaqgFkRpGDT7hC1a5mG9-nH0Q_MJGJccbQjuviMNp13vyV12frW01SB0UXuJPaIqg.iRzQmsjMoFiyZctdeHFxiEZkpkIjzD2B1hsh_UREvAY",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1772542836.162776,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://tetra-poc-338880795815.auth.ap-northeast-1.amazoncognito.com",
+      "localStorage": [
+        {
+          "name": "amznfbgid",
+          "value": "X52-6336387-6652937:1769950824"
+        },
+        {
+          "name": "Amazon.AWS.Cognito.ContextData.LS_UBID",
+          "value": "e8ybcx380abzk17kis7y:1769950834895"
+        }
+      ]
+    }
+  ]
+}

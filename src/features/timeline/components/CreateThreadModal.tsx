@@ -19,7 +19,7 @@ export const CreateThreadModal: React.FC<CreateThreadModalProps> = ({
       onSubmit={onSubmit}
       title="新規投稿"
       submitLabel="投稿する"
-      placeholder=""
+      placeholder="いまどうしてる？"
     />
   );
 };

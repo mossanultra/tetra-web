@@ -7,7 +7,10 @@ test.describe("Guest Mode - Inbox", () => {
 
   test("should show login prompt when accessing inbox", async ({ page }) => {
     // Expect "ログインが必要です"
-    await expect(page.getByText("ログインが必要です")).toBeVisible();
+    // Expect "ログインが必要です"
+    await expect(
+      page.getByRole("heading", { name: "ログインが必要です" }),
+    ).toBeVisible();
 
     // Expect message
     await expect(

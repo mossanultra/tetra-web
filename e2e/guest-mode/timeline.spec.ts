@@ -48,22 +48,31 @@ test.describe("Guest Mode - Timeline", () => {
 
   test("should show login prompt when trying to reply", async ({ page }) => {
     const posts = page.locator("article"); // Assuming ThreadCard
+    // Wait for at least one post to load
+    await expect(posts.first()).toBeVisible({ timeout: 10000 });
+
     if ((await posts.count()) > 0) {
       const firstPost = posts.first();
-      // ThreadCard ref: <button onClick={handleReply}><FaRegComment/></button>
-      // We target the button containing the comment icon
-      const replyButton = firstPost
-        .locator("button")
-        .filter({ has: page.locator("svg") })
-        .first();
+      // Use more robust locator using aria-label
+      const replyButton = firstPost.getByRole("button", { name: "返信" });
 
       if (await replyButton.isVisible()) {
         await replyButton.click();
 
+        // Check if incorrectly logged in (Reply Modal appears instead)
+        const replyModal = page.getByRole("dialog", { name: "返信" });
+        if (await replyModal.isVisible()) {
+          throw new Error(
+            "Login prompt expected, but Reply Modal appeared (User seems logged in?)",
+          );
+        }
+
         // Expect Dialog (ThreadCard implementation confirms this)
         await expect(
-          page.getByText("リプライするにはアカウントが必要です"),
-        ).toBeVisible();
+          page.getByRole("heading", {
+            name: "リプライするにはアカウントが必要です",
+          }),
+        ).toBeVisible({ timeout: 10000 });
         await expect(
           page.getByText(
             "アカウントを作成すると、投稿へのリプライやコメントができるようになります。",

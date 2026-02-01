@@ -48,7 +48,7 @@ export const ThreadComposerModal: React.FC<ThreadComposerModalProps> = ({
         console.log("Resized size:", resizedFile.size, "bytes");
         console.log(
           "Compression ratio:",
-          ((1 - resizedFile.size / file.size) * 100).toFixed(1) + "%"
+          ((1 - resizedFile.size / file.size) * 100).toFixed(1) + "%",
         );
 
         setImage(resizedFile);
@@ -136,6 +136,8 @@ export const ThreadComposerModal: React.FC<ThreadComposerModalProps> = ({
       onClick={handleClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
         className="bg-white rounded-2xl shadow-2xl w-full max-w-xl my-auto"
         onClick={(e) => e.stopPropagation()}
       >
