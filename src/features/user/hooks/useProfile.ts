@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useProfileContext, UserProfile } from "@/src/contexts/ProfileContext";
+import { useProfileContext } from "@/src/contexts/ProfileContext";
+import { UserProfile } from "../types/UserProfile";
+import { getProfile } from "../api/getProfile";
 
 export function useProfile(userId?: string, options?: { enabled?: boolean }) {
   const { enabled = true } = options || {};
@@ -23,22 +25,16 @@ export function useProfile(userId?: string, options?: { enabled?: boolean }) {
       setLocalError(null);
 
       // Handle @self explicitly if passed in dynamic route
-      const endpoint =
-        userId === "@self"
-          ? `/api/user/profile/@self`
-          : `/api/user/profile/${userId}`;
+      const targetUserId =
+        userId === "@self" || userId === undefined ? "@self" : userId;
 
-      const res = await fetch(endpoint);
-      if (!res.ok) throw new Error(`プロフィール取得に失敗 (${res.status})`);
-
-      const profile = (await res.json()) as UserProfile;
+      const profile = await getProfile(targetUserId);
       setLocalData(profile);
     } catch (e) {
       setLocalError(
-        e instanceof Error ? e.message : "プロフィールの取得に失敗しました"
+        e instanceof Error ? e.message : "プロフィールの取得に失敗しました",
       );
     } finally {
-      setLocalLoading(false);
       setLocalLoading(false);
     }
   }, [userId, enabled]);

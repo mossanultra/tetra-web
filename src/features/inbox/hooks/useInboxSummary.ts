@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { InboxResponse, InboxSummary } from "../types/Inbox";
+import { InboxSummary } from "../types/Inbox";
+import { getInboxMessages } from "../api/getInboxMessages";
 
 export const useInboxSummary = (options?: { enabled?: boolean }) => {
   const { enabled = true } = options || {};
@@ -17,9 +18,8 @@ export const useInboxSummary = (options?: { enabled?: boolean }) => {
       // Based on previous file reads, /api/inbox/summary exists but returns a different structure in the backend?
       // Let's stick to the known working /api/inbox for now, or use /api/inbox?limit=1 to be lighter.
 
-      const res = await fetch("/api/inbox?limit=1");
-      if (!res.ok) throw new Error("Failed to fetch summary");
-      const data: InboxResponse = await res.json();
+      // Using request with limit=1 to get summary
+      const data = await getInboxMessages({ limit: 1 });
       setSummary(data.summary);
     } catch (err) {
       console.error(err);

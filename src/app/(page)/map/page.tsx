@@ -1,8 +1,8 @@
 // src/app/points/[id]/page.tsx
-import MapWithCustomModalMarker from "./map";
+import { MapClient } from "@/src/features/map/components/MapClient";
 
 export default async function ServerPointPage({}: {
   params: Promise<{ id: string }>;
 }) {
-  return <MapWithCustomModalMarker zoom={15} />;
+  return <MapClient zoom={15} />;
 }

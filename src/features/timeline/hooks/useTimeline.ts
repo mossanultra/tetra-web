@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Thread } from "../../thread/types/Thread";
+import { getTimeline } from "../api/getTimeline";
 
 type UseTimelineOptions = {
   initialItems?: Thread[];
@@ -25,23 +26,11 @@ export const useTimeline = ({
       try {
         setLoading(true);
 
-        const url = ownerUserId
-          ? `/api/timeline/thread?ownerUserId=${ownerUserId}&limit=${LIMIT}&offset=${currentOffset}`
-          : `/api/timeline?limit=${LIMIT}&offset=${currentOffset}`;
-
-        const res = await fetch(url);
-        if (!res.ok) throw new Error();
-
-        const data = await res.json();
-        let newThreads: Thread[] = [];
-
-        if (ownerUserId) {
-          // ユーザー別: Thread[]
-          newThreads = (data as Thread[]) || [];
-        } else {
-          // 全体: { threads: Thread[], total: number }
-          newThreads = data.threads || [];
-        }
+        const newThreads = await getTimeline({
+          offset: currentOffset,
+          limit: LIMIT,
+          ownerUserId,
+        });
 
         // 次ページ判定: 取得件数がLIMIT未満なら終了
         setHasMore(newThreads.length >= LIMIT);
@@ -50,7 +39,7 @@ export const useTimeline = ({
           // 重複排除して追記
           setItems((prev) => {
             const uniqueNewThreads = newThreads.filter(
-              (nt) => !prev.some((pt) => pt.threadId === nt.threadId)
+              (nt) => !prev.some((pt) => pt.threadId === nt.threadId),
             );
             return [...prev, ...uniqueNewThreads];
           });
@@ -69,7 +58,7 @@ export const useTimeline = ({
         setLoading(false);
       }
     },
-    [ownerUserId]
+    [ownerUserId],
   );
 
   // 初回ロード

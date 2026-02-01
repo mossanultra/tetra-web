@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { Thread } from "../types/Thread";
+import { createThread as apiCreateThread } from "../api/createThread";
+import { deleteThread as apiDeleteThread } from "../api/deleteThread";
+import { getThreads as apiGetThreads } from "../api/getThreads";
 
 export const useThread = (
   initialThread: Thread | null = null,
-  initialChildThreads: Thread[] = []
+  initialChildThreads: Thread[] = [],
 ) => {
   const [thread, setThread] = useState(initialThread);
   const [childThreads, setChildThreads] = useState(initialChildThreads);
@@ -14,15 +17,7 @@ export const useThread = (
 
   const createThread = async (threadName: string, imageUrl: string | null) => {
     try {
-      const res = await fetch("/api/timeline/thread", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ threadName, imageUrl }),
-      });
-
-      if (!res.ok) throw new Error("failed");
-
-      const newThread = await res.json();
+      const newThread = await apiCreateThread({ threadName, imageUrl });
       return newThread;
     } catch (err) {
       setError("投稿に失敗しました");
@@ -33,18 +28,14 @@ export const useThread = (
   const submitReply = async (
     parentThreadId: string,
     threadName: string,
-    imageUrl: string | null
+    imageUrl: string | null,
   ) => {
     try {
-      const res = await fetch("/api/timeline/thread", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ parentThreadId, threadName, imageUrl }),
+      const newThread = await apiCreateThread({
+        threadName,
+        imageUrl,
+        parentThreadId,
       });
-
-      if (!res.ok) throw new Error("failed");
-
-      const newThread = await res.json();
 
       // 現在表示中のメインスレッドへの直接の返信の場合
       if (thread && parentThreadId === thread.threadId) {
@@ -63,8 +54,8 @@ export const useThread = (
           prev.map((t) =>
             t.threadId === parentThreadId
               ? { ...t, childThreadCount: t.childThreadCount + 1 }
-              : t
-          )
+              : t,
+          ),
         );
       }
       return newThread;
@@ -94,11 +85,7 @@ export const useThread = (
 
   const deleteThread = async (threadId: string) => {
     try {
-      const res = await fetch(`/api/timeline/thread?threadId=${threadId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) throw new Error("failed");
+      await apiDeleteThread(threadId);
 
       removeLocalThread(threadId);
     } catch {
@@ -109,23 +96,8 @@ export const useThread = (
   const fetchThreadsByDate = async (startDate: Date, endDate: Date) => {
     try {
       setLoading(true);
-      const startDateStr = startDate.toISOString().split("T")[0];
-      const endDateStr = endDate.toISOString().split("T")[0];
-
-      const res = await fetch(
-        `/api/timeline/query?startDate=${startDateStr}&endDate=${endDateStr}&limit=20`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!res.ok) throw new Error(`データ取得に失敗しました (${res.status})`);
-
-      const data = await res.json();
-      return data.threads || [];
+      const threads = await apiGetThreads(startDate, endDate);
+      return threads;
     } catch {
       setError("タイムラインの取得に失敗しました");
       throw new Error("Failed to fetch threads");

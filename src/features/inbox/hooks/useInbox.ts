@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { InboxMessage, InboxResponse } from "../types/Inbox";
+import { InboxMessage } from "../types/Inbox";
+import { getInboxMessages } from "../api/getInboxMessages";
+import { markMessageAsRead as apiMarkAsRead } from "../api/markMessageAsRead";
+import { markAllMessagesAsRead as apiMarkAllAsRead } from "../api/markAllMessagesAsRead";
+import { deleteMessage as apiDeleteMessage } from "../api/deleteMessage";
 
 export const useInbox = (options?: { enabled?: boolean }) => {
   const { enabled = true } = options || {};
@@ -18,18 +22,17 @@ export const useInbox = (options?: { enabled?: boolean }) => {
       try {
         setLoading(true);
 
-        const res = await fetch(
-          `/api/inbox?limit=${LIMIT}&offset=${currentOffset}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data: InboxResponse = await res.json();
+        const data = await getInboxMessages({
+          limit: LIMIT,
+          offset: currentOffset,
+        });
 
         if (isLoadMore) {
           // 重複排除 (念のため)
           setMessages((prev) => {
             const newMessages = data.messages.filter(
               (newMsg) =>
-                !prev.some((msg) => msg.messageId === newMsg.messageId)
+                !prev.some((msg) => msg.messageId === newMsg.messageId),
             );
             return [...prev, ...newMessages];
           });
@@ -47,7 +50,7 @@ export const useInbox = (options?: { enabled?: boolean }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -69,24 +72,18 @@ export const useInbox = (options?: { enabled?: boolean }) => {
       // Optimistic update
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.messageId === messageId ? { ...msg, isRead: true } : msg
-        )
+          msg.messageId === messageId ? { ...msg, isRead: true } : msg,
+        ),
       );
 
-      const res = await fetch(`/api/inbox/${messageId}/read`, {
-        method: "PUT",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to mark as read");
-      }
+      await apiMarkAsRead(messageId);
     } catch (err) {
       console.error(err);
       // Revert
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.messageId === messageId ? { ...msg, isRead: false } : msg
-        )
+          msg.messageId === messageId ? { ...msg, isRead: false } : msg,
+        ),
       );
     } finally {
       setIsMarking(false);
@@ -100,11 +97,7 @@ export const useInbox = (options?: { enabled?: boolean }) => {
       // Optimistic update
       setMessages((prev) => prev.map((msg) => ({ ...msg, isRead: true })));
 
-      const res = await fetch("/api/inbox/read-all", {
-        method: "PUT",
-      });
-
-      if (!res.ok) throw new Error("Failed to mark all as read");
+      await apiMarkAllAsRead();
     } catch (err) {
       console.error(err);
       // Revert by re-fetching (simplest)
@@ -119,23 +112,17 @@ export const useInbox = (options?: { enabled?: boolean }) => {
       try {
         // Optimistic update
         setMessages((prev) =>
-          prev.filter((msg) => msg.messageId !== messageId)
+          prev.filter((msg) => msg.messageId !== messageId),
         );
 
-        const res = await fetch(`/api/inbox/${messageId}`, {
-          method: "DELETE",
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to delete message");
-        }
+        await apiDeleteMessage(messageId);
       } catch (err) {
         console.error(err);
         // Revert by re-fetching
         fetchMessages(0, false);
       }
     },
-    [fetchMessages]
+    [fetchMessages],
   );
 
   return {

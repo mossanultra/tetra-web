@@ -8,13 +8,9 @@ import React, {
   ReactNode,
 } from "react";
 
-export interface UserProfile {
-  profileId: string;
-  userName: string;
-  imageUrl: string;
-  introduction: string;
-  url: string;
-}
+import { UserProfile } from "@/src/features/user/types/UserProfile";
+import { getProfile } from "@/src/features/user/api/getProfile";
+import { updateProfile as apiUpdateProfile } from "@/src/features/user/api/updateProfile";
 
 interface UpdateProfileParams {
   nickname: string;
@@ -46,26 +42,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       setIsFetching(true);
       setError(null);
 
-      const endpoint = userId
-        ? `/api/user/profile/${userId}`
-        : `/api/user/profile/@self`;
-
-      const res = await fetch(endpoint);
-
-      if (!res.ok) throw new Error(`プロフィール取得に失敗 (${res.status})`);
-
-      const profile = (await res.json()) as UserProfile;
+      const targetUserId = userId || "@self";
+      const profile = await getProfile(targetUserId);
       setData(profile);
 
       // 自分自身かどうか判定
-      const selfRes = await fetch(`/api/user/profile/@self`);
-      if (selfRes.ok) {
-        const selfData = (await selfRes.json()) as UserProfile;
-        setIsOwnProfile(!userId || selfData.profileId === profile.profileId);
-      }
+      const selfData = await getProfile("@self");
+      setIsOwnProfile(!userId || selfData.profileId === profile.profileId);
     } catch (e) {
       setError(
-        e instanceof Error ? e.message : "プロフィールの取得に失敗しました"
+        e instanceof Error ? e.message : "プロフィールの取得に失敗しました",
       );
     } finally {
       setIsFetching(false);
@@ -78,21 +64,12 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         setError(null);
         const { nickname, bio, imageUrl, url } = params;
 
-        const res = await fetch("/api/user/profile", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userName: nickname,
-            introduction: bio,
-            imageUrl,
-            url,
-          }),
+        await apiUpdateProfile({
+          nickname,
+          bio,
+          imageUrl,
+          url,
         });
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || "更新に失敗しました");
-        }
 
         // Update local state immediately
         await fetchProfile();
@@ -102,7 +79,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         return false;
       }
     },
-    [fetchProfile]
+    [fetchProfile],
   );
 
   const clearProfile = useCallback(() => {

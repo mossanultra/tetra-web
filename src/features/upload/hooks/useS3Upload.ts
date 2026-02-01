@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 
-interface PresignedURLResponse {
-  uploadUrl: string;
-  fileUrl: string;
-  key: string;
-}
+import { getPresignedUrl } from "../api/getPresignedUrl";
+import { uploadFileToS3 as apiUploadFileToS3 } from "../api/uploadFileToS3";
 
 export const useS3Upload = () => {
   const [uploading, setUploading] = useState(false);
@@ -27,44 +24,16 @@ export const useS3Upload = () => {
 
       stage = "FETCH_PRESIGNED_URL";
       // 1. Get Presigned URL
-      const presignedResponse = await fetch("/api/upload/presigned-url", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fileName: file.name,
-          fileType: file.type,
-        }),
-      });
-
-      if (!presignedResponse.ok) {
-        throw new Error("Failed to get upload URL");
-      }
-
-      const { uploadUrl, fileUrl }: PresignedURLResponse =
-        await presignedResponse.json();
+      const { uploadUrl, fileUrl } = await getPresignedUrl(
+        file.name,
+        file.type,
+      );
 
       console.log("Presigned URL obtained, uploading to S3...");
 
       stage = "UPLOAD_TO_S3";
       // 2. Upload to S3
-      const uploadResponse = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": file.type,
-        },
-        mode: "cors",
-        body: file,
-      });
-
-      console.log("S3 upload response status:", uploadResponse.status);
-
-      if (!uploadResponse.ok) {
-        const errorText = await uploadResponse.text();
-        console.error("S3 upload error:", errorText);
-        throw new Error("Failed to upload file to S3");
-      }
+      await apiUploadFileToS3(uploadUrl, file);
 
       setProgress(100);
       console.log("Upload successful, fileUrl:", fileUrl);

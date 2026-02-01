@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import { CalendarWidget } from "@/src/features/calendar/components/CalendarWidget";
+import { getMyself } from "@/src/features/user/api/getMyself";
 import { FaCalendarAlt } from "react-icons/fa";
 import { ImageModal } from "@/src/features/thread/components/ImageModal";
 import { ReplyModal } from "@/src/features/thread/components/ReplyModal";
@@ -25,7 +25,7 @@ const CalendarTimelinePage = () => {
   const [userId, serUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedThreads, setBookmarkedThreads] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   // モーダル関連
@@ -58,32 +58,20 @@ const CalendarTimelinePage = () => {
     } catch (err) {
       console.error(err);
       setError(
-        err instanceof Error ? err.message : "不明なエラーが発生しました"
+        err instanceof Error ? err.message : "不明なエラーが発生しました",
       );
     }
   };
 
   const fetchUserId = async () => {
     try {
-      const res = await fetch(`/api/user`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`データ取得に失敗しました (${res.status})`);
-      }
-
-      const data = await res.json();
+      const data = await getMyself();
       serUserId(data.userId || null);
     } catch (err) {
       console.error(err);
       setError(
-        err instanceof Error ? err.message : "不明なエラーが発生しました"
+        err instanceof Error ? err.message : "不明なエラーが発生しました",
       );
-    } finally {
     }
   };
 
@@ -110,7 +98,7 @@ const CalendarTimelinePage = () => {
       const end = dateRange[1];
       if (start && end) {
         return `${start.toLocaleDateString(
-          "ja-JP"
+          "ja-JP",
         )} 〜 ${end.toLocaleDateString("ja-JP")}`;
       } else if (start) {
         return start.toLocaleDateString("ja-JP");
@@ -195,108 +183,7 @@ const CalendarTimelinePage = () => {
             )}
 
             {/* カレンダー */}
-            <div className="calendar-container">
-              <Calendar
-                onChange={handleDateChange}
-                value={dateRange}
-                selectRange={true}
-                locale="ja-JP"
-                className="w-full border-none"
-              />
-            </div>
-
-            <style jsx global>{`
-              .calendar-container .react-calendar {
-                width: 100%;
-                border: none;
-                font-family: inherit;
-              }
-              .react-calendar__navigation {
-                display: flex;
-                margin-bottom: 1rem;
-              }
-              .react-calendar__navigation button {
-                min-width: 44px;
-                background: none;
-                font-size: 1rem;
-                font-weight: 600;
-                color: #1f2937;
-                padding: 0.5rem;
-                border-radius: 0.5rem;
-              }
-              .react-calendar__navigation button:enabled:hover,
-              .react-calendar__navigation button:enabled:focus {
-                background-color: #f3f4f6;
-              }
-              .react-calendar__navigation button:disabled {
-                background-color: transparent;
-                color: #9ca3af;
-              }
-              .react-calendar__month-view__weekdays {
-                text-align: center;
-                font-weight: 600;
-                font-size: 0.875rem;
-                color: #6b7280;
-                margin-bottom: 0.5rem;
-              }
-              .react-calendar__month-view__weekdays__weekday {
-                padding: 0.5rem;
-              }
-              .react-calendar__month-view__weekdays__weekday abbr {
-                text-decoration: none;
-              }
-              .react-calendar__tile {
-                max-width: 100%;
-                padding: 0.75rem 0.5rem;
-                background: none;
-                text-align: center;
-                font-size: 0.875rem;
-                border-radius: 0.5rem;
-                aspect-ratio: 1;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-              .react-calendar__tile:enabled:hover,
-              .react-calendar__tile:enabled:focus {
-                background-color: #f3f4f6;
-              }
-              .react-calendar__tile--now {
-                background-color: #dbeafe;
-                color: #1e40af;
-                font-weight: 600;
-              }
-              .react-calendar__tile--now:enabled:hover,
-              .react-calendar__tile--now:enabled:focus {
-                background-color: #bfdbfe;
-              }
-              .react-calendar__tile--active {
-                background-color: #3b82f6 !important;
-                color: white !important;
-                font-weight: 600;
-              }
-              .react-calendar__tile--active:enabled:hover,
-              .react-calendar__tile--active:enabled:focus {
-                background-color: #2563eb !important;
-              }
-              .react-calendar__tile--rangeStart,
-              .react-calendar__tile--rangeEnd {
-                background-color: #3b82f6 !important;
-                color: white !important;
-              }
-              .react-calendar__tile--range {
-                background-color: #dbeafe !important;
-                color: #1e40af !important;
-              }
-              .react-calendar__month-view__days__day--neighboringMonth {
-                color: #d1d5db;
-              }
-              .react-calendar__year-view .react-calendar__tile,
-              .react-calendar__decade-view .react-calendar__tile,
-              .react-calendar__century-view .react-calendar__tile {
-                padding: 1rem;
-              }
-            `}</style>
+            <CalendarWidget value={dateRange} onChange={handleDateChange} />
           </div>
 
           {/* スレッド一覧セクション */}
