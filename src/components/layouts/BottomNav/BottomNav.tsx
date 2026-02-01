@@ -10,7 +10,7 @@ import {
   FaCalendarAlt,
   FaUser,
 } from "react-icons/fa";
-import { useInboxSummary } from "@/src/features/inbox/hooks/useInboxSummary";
+import { useInboxContext } from "@/src/contexts/InboxContext";
 import {
   useLoginMode,
   LoginMode,
@@ -29,7 +29,7 @@ const BottomNav: React.FC = () => {
     checkMode();
   }, [getLoginMode]);
 
-  const { unreadCount } = useInboxSummary({ enabled: !isGuest });
+  const { unreadCount } = useInboxContext();
 
   const navItems = [
     {
