@@ -4,8 +4,14 @@ export const getThreads = async (
   startDate: Date,
   endDate: Date,
 ): Promise<Thread[]> => {
-  const startDateStr = startDate.toISOString().split("T")[0];
-  const endDateStr = endDate.toISOString().split("T")[0];
+  // Expand range to handle timezone differences (JST vs UTC)
+  const expandedStart = new Date(startDate);
+  expandedStart.setDate(expandedStart.getDate() - 1);
+  const expandedEnd = new Date(endDate);
+  expandedEnd.setDate(expandedEnd.getDate() + 1);
+
+  const startDateStr = expandedStart.toISOString().split("T")[0];
+  const endDateStr = expandedEnd.toISOString().split("T")[0];
 
   const res = await fetch(
     `/api/timeline/query?startDate=${startDateStr}&endDate=${endDateStr}&limit=20`,

@@ -15,10 +15,12 @@ test.describe("Normal Mode - Map", () => {
     await page
       .locator(".gm-style")
       .first()
-      .click({ position: { x: 100, y: 100 } });
+      .click({ position: { x: 200, y: 200 } });
 
     // 2. Verify PinCreationDialog is visible
-    const dialog = page.getByRole("dialog");
+    const dialog = page
+      .getByRole("dialog")
+      .filter({ has: page.getByRole("heading", { name: "新しいピン" }) });
     await expect(dialog).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "新しいピン" }),

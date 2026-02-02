@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     console.error("Thread SelectRange API error:", error);
     return NextResponse.json(
       { error: "Failed to fetch thread range" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
