@@ -284,14 +284,14 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
                 <span>📅</span>
                 <span>
                   {formatEventDateRange(
-                    thread.categoryContent.startDate,
-                    thread.categoryContent.endDate,
+                    thread.categoryContent?.startDate || "",
+                    thread.categoryContent?.endDate || "",
                   )}
                 </span>
               </div>
 
               {/* detail */}
-              {thread.categoryContent.detail && (
+              {thread.categoryContent?.detail && (
                 <div
                   className={`text-gray-600 mb-2 ${
                     isCompact
@@ -304,7 +304,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
               )}
 
               {/* url */}
-              {thread.categoryContent.url && (
+              {thread.categoryContent?.url && (
                 <div className="mb-2">
                   <a
                     href={thread.categoryContent.url}
@@ -323,7 +323,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
           )}
 
           {/* image */}
-          {thread.categoryContent.imageUrl && (
+          {thread.categoryContent?.imageUrl && (
             <div className="relative mt-3 mb-2 w-9/12">
               <Image
                 src={thread.categoryContent.imageUrl}
@@ -335,7 +335,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
                   onImageClick
                     ? (e) => {
                         e.stopPropagation();
-                        onImageClick(thread.categoryContent.imageUrl!);
+                        onImageClick(thread.categoryContent?.imageUrl!);
                       }
                     : undefined
                 }
