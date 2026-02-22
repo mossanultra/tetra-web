@@ -17,7 +17,7 @@ export interface ParsedMessage {
  * Handles both new JSON format and legacy plain text format
  */
 export function parseMessageContent(
-  message: InboxMessageContent
+  message: InboxMessageContent,
 ): ParsedMessage {
   try {
     const parsedContent = JSON.parse(message.content) as ParsedMessageContent;
@@ -37,6 +37,7 @@ export function parseMessageContent(
         parsedContent,
       };
     } else if (message.type === "newEvent") {
+      console.log("New event message:", parsedContent);
       const eventContent = parsedContent as NewEventMessageContent;
       // Display event title and location
       return {
@@ -57,7 +58,7 @@ export function parseMessageContent(
     // JSON parse failed - likely legacy plain text format
     console.debug(
       "Failed to parse message content as JSON, using raw content:",
-      error
+      error,
     );
     return {
       type: message.type,

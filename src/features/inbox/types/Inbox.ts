@@ -23,6 +23,7 @@ export interface NewEventMessageContent {
   address: string;
   title: string;
   date: string;
+  id: string;
 }
 
 export type ParsedMessageContent =

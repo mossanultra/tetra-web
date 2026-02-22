@@ -18,20 +18,11 @@ export async function POST(request: NextRequest) {
     if (!fileName || !fileType) {
       return NextResponse.json(
         { error: "fileName and fileType are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Forward request to backend
-    console.log("=== Presigned URL Request ===");
-    console.log("Backend URL:", `${apiBaseUrl}/upload/presigned-url`);
-    console.log("FileName:", fileName);
-    console.log("FileType:", fileType);
-    console.log(
-      "Authorization header:",
-      session.idToken ? "Present" : "Missing"
-    );
-
     const response = await fetch(`${apiBaseUrl}/upload/presigned-url`, {
       method: "POST",
       headers: {
@@ -41,8 +32,6 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({ fileName, fileType }),
     });
 
-    console.log("Response status:", response.status);
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Backend error response:", errorText);
@@ -50,13 +39,12 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log("Presigned URL received successfully");
     return NextResponse.json(data);
   } catch (error) {
     console.error("Presigned URL API error:", error);
     return NextResponse.json(
       { error: "Failed to get presigned URL" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

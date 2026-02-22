@@ -37,7 +37,7 @@ export async function GET() {
     console.error("User API error:", error);
     return NextResponse.json(
       { error: "Failed to fetch user data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -70,7 +70,6 @@ export async function POST() {
 
 export async function DELETE() {
   try {
-    console.log("DELETE");
     const session = await auth();
 
     if (!session?.idToken) {
@@ -83,8 +82,6 @@ export async function DELETE() {
         Authorization: session.idToken as string,
       },
     });
-
-    console.log(response);
 
     if (!response.ok) {
       throw new Error(`Failed to delete user: ${response.status}`);

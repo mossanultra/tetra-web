@@ -5,7 +5,7 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ messageId: string }> }
+  { params }: { params: Promise<{ messageId: string }> },
 ) {
   try {
     const session = await auth();
@@ -28,7 +28,7 @@ export async function GET(
       if (response.status === 404) {
         return NextResponse.json(
           { error: "Message not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
       throw new Error(`API error: ${response.status}`);
@@ -40,15 +40,14 @@ export async function GET(
     console.error("Inbox message detail API error:", error);
     return NextResponse.json(
       { error: "Failed to fetch message detail" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ messageId: string }> }
+  { params }: { params: Promise<{ messageId: string }> },
 ) {
-  console.log("DELETE");
   try {
     const session = await auth();
 
@@ -70,7 +69,7 @@ export async function DELETE(
       if (response.status === 404) {
         return NextResponse.json(
           { error: "Message not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
       throw new Error(`API error: ${response.status}`);
@@ -82,7 +81,7 @@ export async function DELETE(
     console.error("Inbox message detail API error:", error);
     return NextResponse.json(
       { error: "Failed to fetch message detail" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

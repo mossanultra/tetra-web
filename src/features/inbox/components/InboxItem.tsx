@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -11,17 +12,11 @@ import { parseMessageContent } from "../utils/messageParser";
 
 interface InboxItemProps {
   message: InboxMessage;
-  onRead: (messageId: string) => void;
   onDelete: (messageId: string) => void;
-  isMarking: boolean;
 }
 
-export const InboxItem: React.FC<InboxItemProps> = ({
-  message,
-  onRead,
-  onDelete,
-  isMarking,
-}) => {
+export const InboxItem: React.FC<InboxItemProps> = ({ message, onDelete }) => {
+  const router = useRouter();
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString("ja-JP", {
@@ -30,12 +25,6 @@ export const InboxItem: React.FC<InboxItemProps> = ({
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
-
-  const handleClick = () => {
-    if (!message.isRead && !isMarking) {
-      onRead(message.messageId);
-    }
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -50,7 +39,7 @@ export const InboxItem: React.FC<InboxItemProps> = ({
 
   // Parse message content
   const { displayContent, parsedContent } = parseMessageContent(
-    message.message
+    message.message,
   );
   const isReplyMessage = message.message.type === "reply" && parsedContent;
   const isNewEventMessage =
@@ -58,7 +47,7 @@ export const InboxItem: React.FC<InboxItemProps> = ({
 
   return (
     <article
-      onClick={handleClick}
+      onClick={() => router.push(`/inbox/${message.messageId}`)}
       className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer group relative ${
         !message.isRead ? "bg-blue-50/30" : ""
       }`}
@@ -131,7 +120,7 @@ export const InboxItem: React.FC<InboxItemProps> = ({
               <span className="text-gray-600">
                 📅{" "}
                 {new Date(
-                  (parsedContent as NewEventMessageContent).date
+                  (parsedContent as NewEventMessageContent).date,
                 ).toLocaleDateString("ja-JP", {
                   year: "numeric",
                   month: "long",

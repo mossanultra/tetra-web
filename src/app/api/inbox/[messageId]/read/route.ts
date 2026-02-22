@@ -5,7 +5,7 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ messageId: string }> }
+  { params }: { params: Promise<{ messageId: string }> },
 ) {
   try {
     const session = await auth();
@@ -15,7 +15,6 @@ export async function PUT(
     }
 
     const { messageId } = await params;
-
     const response = await fetch(`${apiBaseUrl}/inbox/${messageId}/read`, {
       method: "PUT",
       headers: {
@@ -28,7 +27,7 @@ export async function PUT(
       if (response.status === 404) {
         return NextResponse.json(
           { error: "Message not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
       throw new Error(`API error: ${response.status}`);
@@ -40,7 +39,7 @@ export async function PUT(
     console.error("Inbox mark read API error:", error);
     return NextResponse.json(
       { error: "Failed to mark message as read" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
