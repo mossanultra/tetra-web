@@ -131,6 +131,30 @@ export default function SidebarNavigation({ open, onClose }: Props) {
             <FaBug size={20} />
             <span className="text-sm font-medium">FCMトークン送信(Debug)</span>
           </button>
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/news", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ region: "福島県　いわき市" }),
+                });
+                if (res.ok) {
+                  alert("ニュース取得に成功しました");
+                } else {
+                  alert("ニュース取得に失敗しました: " + res.status);
+                }
+              } catch (e) {
+                alert("エラーが発生しました: " + e);
+              }
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-400 hover:bg-neutral-800 hover:text-white transition-all duration-200"
+          >
+            <FaBug size={20} />
+            <span className="text-sm font-medium">/news 実行(Debug)</span>
+          </button>
           <Link
             href="/signout"
             onClick={onClose}
