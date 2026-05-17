@@ -35,6 +35,15 @@ const ProfilePage: React.FC = () => {
     fetchProfile,
   } = useProfile(userId, { enabled: isGuest === false });
 
+  // デバッグ用のログ追加
+  useEffect(() => {
+    if (data) {
+      console.log("[ProfilePage DEBUG] Route userId:", userId);
+      console.log("[ProfilePage DEBUG] Profile profileId:", data.profileId);
+      console.log("[ProfilePage DEBUG] isOwnProfile:", isOwnProfile);
+    }
+  }, [userId, data, isOwnProfile]);
+
   useEffect(() => {
     if (isGuest === false) {
       fetchProfile();

@@ -45,6 +45,15 @@ export function useProfile(userId?: string, options?: { enabled?: boolean }) {
       ? context.data.profileId === localData.profileId
       : userId === "@self"; // fallback
 
+  if (userId) {
+    console.log("[useProfile DEBUG] isOwnProfileLocal check:", {
+      contextProfileId: context.data?.profileId,
+      localProfileId: localData?.profileId,
+      userId,
+      isOwnProfileLocal,
+    });
+  }
+
   // If userId is NOT provided (or undefined/null), use Context (Global/My Profile)
   if (!userId) {
     return {

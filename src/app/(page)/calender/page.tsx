@@ -204,7 +204,7 @@ const CalendarTimelinePage = () => {
             {threads.map((thread) => {
               const d = new Date(thread.createdAt);
               const dateStr = `${d.getMonth() + 1}月${d.getDate()}日`;
-              const tagColor = thread.category === "event" ? "#f83600" : thread.category === "community" ? "#1A6B5A" : "#3b82f6";
+              const tagColor = thread.category === "event" ? "#f83600" : "#3b82f6";
               
               return (
                 <div 

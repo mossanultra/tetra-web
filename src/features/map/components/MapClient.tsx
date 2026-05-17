@@ -158,7 +158,7 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
                     onClick={() => handleMarkerClick(p)}
                   >
                     <div className="bg-white rounded-md shadow px-1.5 py-0.5 text-[10px] font-bold mb-1 whitespace-nowrap">
-                      {p.pointName}
+                      {p.threadName}
                     </div>
                     <div className="map-pin-circle" style={{ background: color }}>{emoji}</div>
                     <div className="map-pin-tail" style={{ borderTop: `10px solid ${color}` }}></div>

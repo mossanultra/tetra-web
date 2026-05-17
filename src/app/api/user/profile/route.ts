@@ -32,6 +32,7 @@ export async function PUT(request: NextRequest) {
     try {
       const body = await request.clone().json();
       const mockUpdatedProfile = {
+        profileId: "user_muscle",
         userId: "user_muscle",
         userName: body.nickname || "筋肉マッチョまん",
         imageUrl: body.imageUrl || null,
@@ -76,6 +77,7 @@ export async function POST(request: NextRequest) {
     try {
       const body = await request.clone().json();
       const mockCreatedProfile = {
+        profileId: "user_muscle",
         userId: "user_muscle",
         userName: body.nickname || "筋肉マッチョまん",
         imageUrl: body.imageUrl || null,

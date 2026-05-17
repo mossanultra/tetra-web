@@ -121,7 +121,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
   const cardOpacity = isDeleting ? "opacity-50 pointer-events-none" : "";
 
   // Temporary mock data mapping since API doesn't have exact fields yet
-  const emoji = thread.category === "event" ? "🔥" : thread.category === "community" ? "💪" : "💬";
+  const emoji = thread.category === "event" ? "🔥" : "💬";
   const grad = thread.category === "event" 
     ? "linear-gradient(135deg,#f83600,#f9d423)" 
     : "linear-gradient(135deg,#d4fc79,#96e6a1)";
@@ -142,7 +142,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
         )}
         <div className="absolute inset-0 flex items-end p-3">
           <span className="text-white text-xs font-bold bg-black/30 px-2 py-0.5 rounded-full">
-            📍 {thread.categoryContent?.url ? "リンクあり" : "場所未設定"}
+            📍 {thread.category === "event" && thread.categoryContent.url ? "リンクあり" : "場所未設定"}
           </span>
         </div>
       </div>
@@ -189,13 +189,13 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({
           {thread.threadName}
         </p>
         
-        {thread.categoryContent?.detail && (
+        {thread.category === "event" && thread.categoryContent.detail && (
           <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-1.5">
             {thread.categoryContent.detail}
           </p>
         )}
 
-        {thread.categoryContent?.url && (
+        {thread.category === "event" && thread.categoryContent.url && (
           <a href={thread.categoryContent.url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} className="text-xs block mb-1.5 truncate text-brand">
             🔗 {thread.categoryContent.url}
           </a>

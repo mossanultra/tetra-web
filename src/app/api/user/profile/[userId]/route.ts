@@ -37,6 +37,7 @@ export async function GET(
     
     // Detailed mock profile matching schema
     const mockProfile = {
+      profileId: userId === "@self" ? "user_muscle" : userId,
       userId: userId === "@self" ? "user_muscle" : userId,
       userName: userId === "@self" ? "筋肉マッチョまん" : `ユーザー_${userId.slice(0, 4)}`,
       imageUrl: null,

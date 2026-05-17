@@ -135,8 +135,8 @@ export default function SidebarNavigation() {
             <FaUser className="text-gray-400" size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold truncate">{profile?.nickname || "ゲスト"}</p>
-            <p className="text-xs text-gray-400 truncate">@{profile?.id || "guest"}</p>
+            <p className="text-sm font-bold truncate">{profile?.userName || "ゲスト"}</p>
+            <p className="text-xs text-gray-400 truncate">@{profile?.profileId || "guest"}</p>
           </div>
           <Link href="/signout" className="text-gray-400 hover:text-gray-600 flex-shrink-0">
             <FaSignOutAlt size={16} />
