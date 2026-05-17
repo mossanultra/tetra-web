@@ -33,7 +33,7 @@ export default async function ThreadPage({ params }: PageProps) {
         ...(session?.idToken ? { Authorization: session.idToken } : {}),
       },
       cache: "no-store",
-    }
+    },
   );
 
   // =========================
@@ -72,10 +72,8 @@ export default async function ThreadPage({ params }: PageProps) {
     childThreads: ThreadResponse[];
   } = await res.json();
 
-  console.log(data);
-
   const normalizedChildThreads: Thread[] = data.childThreads.map(
-    (item) => item.thread
+    (item) => item.thread,
   );
 
   return (

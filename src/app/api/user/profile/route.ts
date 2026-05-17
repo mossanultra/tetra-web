@@ -6,10 +6,6 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 export async function PUT(request: NextRequest) {
   try {
     const session = await auth();
-
-    console.log("=== User Update API ===");
-    console.log("Backend URL:", `${apiBaseUrl}/user/profile`);
-
     if (!session?.idToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

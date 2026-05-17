@@ -126,9 +126,7 @@ export const InboxList: React.FC = () => {
             <InboxItem
               key={message.messageId}
               message={message}
-              onRead={markAsRead}
               onDelete={deleteMessage}
-              isMarking={isMarking}
             />
           ))}
         </div>

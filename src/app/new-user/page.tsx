@@ -107,8 +107,6 @@ const NewUserPage = () => {
         imageUrl,
         url: userData.url,
       };
-      console.log("Sending profile update payload:", payload);
-
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {

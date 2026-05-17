@@ -36,21 +36,7 @@ export const ThreadComposerModal: React.FC<ThreadComposerModalProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       try {
-        console.log("=== Thread Image Resize Start ===");
-        console.log("File name:", file.name);
-        console.log("File type:", file.type);
-        console.log("File size:", file.size, "bytes");
-
-        // Resize image before preview
         const resizedFile = await resizeImage(file, 1920, 1920, 0.9);
-
-        console.log("Original size:", file.size, "bytes");
-        console.log("Resized size:", resizedFile.size, "bytes");
-        console.log(
-          "Compression ratio:",
-          ((1 - resizedFile.size / file.size) * 100).toFixed(1) + "%",
-        );
-
         setImage(resizedFile);
         const reader = new FileReader();
         reader.onloadend = () => {

@@ -112,6 +112,11 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
         center={center}
         zoom={zoom}
         onLoad={onMapLoad}
+        options={{
+          disableDefaultUI: true,
+          gestureHandling: "greedy",
+          mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "",
+        }}
         onClick={(e) => {
           if (activeId) {
             setActiveId(null);

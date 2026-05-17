@@ -51,7 +51,7 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
   const [detail, setDetail] = useState("");
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -79,7 +79,7 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
 
   const handleDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    setter: (date: Date | null) => void
+    setter: (date: Date | null) => void,
   ) => {
     const val = event.target.value;
     const date = val ? new Date(val) : null;
@@ -183,8 +183,8 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
 
         {/* Date Fields - Show for Event */}
         {isEvent && (
-          <div className="flex gap-4 mb-4">
-            <div className="flex-1">
+          <div className="flex flex-col gap-4 mb-4">
+            <div>
               <label className="block text-xs font-medium text-gray-500 mb-1">
                 開始日時 <span className="text-red-500">*</span>
               </label>
@@ -201,7 +201,7 @@ export const PinCreationDialog: React.FC<PinCreationDialogProps> = ({
                 />
               </div>
             </div>
-            <div className="flex-1">
+            <div>
               <label className="block text-xs font-medium text-gray-500 mb-1">
                 終了日時 <span className="text-red-500">*</span>
               </label>
