@@ -46,105 +46,55 @@ export const InboxItem: React.FC<InboxItemProps> = ({ message, onDelete }) => {
     message.message.type === "newEvent" && parsedContent;
 
   return (
-    <article
+    <div
       onClick={() => router.push(`/inbox/${message.messageId}`)}
-      className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer group relative ${
-        !message.isRead ? "bg-blue-50/30" : ""
+      className={`flex items-start gap-3 px-4 py-4 border-b border-gray-50 cursor-pointer active:opacity-80 transition group relative ${
+        !message.isRead ? "bg-brand-pale" : ""
       }`}
     >
-      <div className="flex gap-4">
-        {/* Avatar */}
-        <div className="flex-shrink-0 pt-1">
-          <Image
-            src={avatarUrl}
-            alt={senderName}
-            width={40}
-            height={40}
-            className="rounded-full object-cover border border-gray-200 w-10 h-10"
-            unoptimized
-          />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-start mb-0.5">
-            <h3
-              className={`text-[15px] truncate pr-2 ${
-                !message.isRead
-                  ? "font-bold text-gray-900"
-                  : "font-medium text-gray-900/80"
-              }`}
-            >
-              {message.message.subject}
-            </h3>
-            <div className="flex items-center gap-3 flex-shrink-0 pt-0.5">
-              <span className="text-sm text-gray-500 whitespace-nowrap">
-                {formatDate(message.message.createdAt)}
-              </span>
-              <button
-                onClick={handleDelete}
-                className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 opacity-0 group-hover:opacity-100 focus:opacity-100"
-                aria-label="削除"
-                title="削除"
-              >
-                <MdDeleteOutline size={18} />
-              </button>
-            </div>
-          </div>
-
-          <div className="text-sm text-gray-500 mb-1 font-medium">
-            {senderName}
-          </div>
-
-          <p className="text-[15px] text-gray-900 leading-normal whitespace-pre-wrap line-clamp-2 break-all">
-            {displayContent}
-          </p>
-
-          {/* Reply message additional info */}
-          {isReplyMessage && (
-            <div className="mt-2 flex items-center gap-2 text-sm">
-              <Link
-                href={`/timeline/${
-                  (parsedContent as ReplyMessageContent).ownerThreadId
-                }`}
-                className="text-blue-600 hover:text-blue-700 hover:underline"
-                onClick={(e) => e.stopPropagation()}
-              >
-                スレッドを見る →
-              </Link>
-            </div>
-          )}
-
-          {/* New event message additional info */}
-          {isNewEventMessage && (
-            <div className="mt-2 flex items-center gap-3 text-sm">
-              <span className="text-gray-600">
-                📅{" "}
-                {new Date(
-                  (parsedContent as NewEventMessageContent).date,
-                ).toLocaleDateString("ja-JP", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-              <Link
-                href={`/timeline/${
-                  (parsedContent as NewEventMessageContent).pointInfoId
-                }`}
-                className="text-blue-600 hover:text-blue-700 hover:underline"
-                onClick={(e) => e.stopPropagation()}
-              >
-                イベントを見る →
-              </Link>
-            </div>
-          )}
-        </div>
-        {!message.isRead && (
-          <div className="flex items-center justify-center flex-shrink-0 ml-2 self-center">
-            <div className="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
-          </div>
-        )}
+      {/* Avatar */}
+      <div className="flex-shrink-0">
+        <Image
+          src={avatarUrl}
+          alt={senderName}
+          width={48}
+          height={48}
+          className="rounded-full object-cover w-12 h-12"
+          unoptimized
+        />
       </div>
-    </article>
+
+      <div className="flex-1 min-w-0 pr-2">
+        <p className="text-sm text-gray-800 leading-snug mb-1">
+          <span className="font-bold">{senderName}</span>{" "}
+          {message.message.type === "reply" && "さんがコメントしました"}
+          {message.message.type === "like" && "さんがいいねしました"}
+          {message.message.type === "follow" && "さんがフォローしました"}
+          {message.message.type === "newEvent" && "から新しいイベントが登録されました"}
+          {!["reply", "like", "follow", "newEvent"].includes(message.message.type) && "から通知がありました"}
+        </p>
+
+        <p className="text-xs text-gray-500 line-clamp-1">
+          {displayContent}
+        </p>
+      </div>
+
+      <div className="flex flex-col items-end gap-2 flex-shrink-0 ml-1 mt-0.5">
+        <span className="text-xs text-gray-400">
+          {formatDate(message.message.createdAt)}
+        </span>
+        {!message.isRead && (
+          <div className="w-2.5 h-2.5 rounded-full bg-brand"></div>
+        )}
+        <button
+          onClick={handleDelete}
+          className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full opacity-0 group-hover:opacity-100"
+          aria-label="削除"
+          title="削除"
+        >
+          <MdDeleteOutline size={16} />
+        </button>
+      </div>
+    </div>
   );
 };

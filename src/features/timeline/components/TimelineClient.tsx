@@ -95,9 +95,42 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
     // 通報処理の実装
   };
 
+  const [selectedGenre, setSelectedGenre] = useState<string>("");
+
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-2xl mx-auto border-x border-gray-200 min-h-screen">
+    <div className="absolute inset-0 flex flex-col bg-gray-50 md:max-w-2xl md:mx-auto md:w-full md:border-x md:border-gray-200 md:bg-white md:shadow-sm">
+      {/* タイムライン用ヘッダー */}
+      <div className="flex-shrink-0 bg-white px-4 py-3 flex items-center justify-between border-b border-gray-100">
+        <h1 className="text-base font-black">掲示板</h1>
+        <div className="flex gap-2">
+          {/* Notification button on mobile timeline */}
+          <button className="md:hidden relative w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+            <svg width="17" height="17" viewBox="0 0 22 22" fill="none">
+              <path d="M11 2C7.7 2 5 4.7 5 8V14L3.5 15.5V16H18.5V15.5L17 14V8C17 4.7 14.3 2 11 2Z" stroke="#374151" strokeWidth="1.5" />
+              <path d="M9 16C9 17.1 9.9 18 11 18S13 17.1 13 16" stroke="#374151" strokeWidth="1.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* フィルターチップ */}
+      <div className="flex-shrink-0 bg-white border-b border-gray-100 px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar">
+        {["すべて", "イベント・出店", "お店", "コミュニティ", "AIニュース"].map(genre => (
+          <button
+            key={genre}
+            onClick={() => setSelectedGenre(genre === "すべて" ? "" : genre)}
+            className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
+              (selectedGenre === genre || (genre === "すべて" && !selectedGenre))
+                ? "bg-brand text-white"
+                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            {genre}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex-1 overflow-y-auto" id="scrollableDiv">
         {/* エラー */}
         {error && (
           <div className="mx-4 mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">
@@ -113,7 +146,7 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
           scrollableTarget="scrollableDiv"
           loader={
             <div className="flex justify-center items-center py-6">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500" />
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand" />
             </div>
           }
           endMessage={
@@ -125,8 +158,10 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
             )
           }
         >
-          <div className="divide-y divide-gray-200">
-            {items.map((thread) => (
+          <div className="px-4 py-3 space-y-3">
+            {items
+              .filter(item => !selectedGenre || item.category === selectedGenre) // NOTE: category filtering is basic for now
+              .map((thread) => (
               <ThreadCard
                 key={thread.threadId}
                 thread={thread}
@@ -165,7 +200,7 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
       {/* 画像モーダル */}
       <ImageModal imageUrl={openImage} onClose={() => setOpenImage(null)} />
 
-      {/* 新規投稿モーダル */}
+      {/* 新規投稿モーダル (FAB click) */}
       <CreateThreadModal
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
@@ -179,22 +214,6 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
         title="投稿するにはアカウントが必要です"
         message="アカウントを作成すると、新しいスレッドを作成して、イベントや話題を共有できるようになります。"
       />
-
-      {/* 新規投稿ボタン (FAB) */}
-      <button
-        onClick={async () => {
-          const mode = await getLoginMode();
-          if (mode === LoginMode.GUEST) {
-            openDialog();
-            return;
-          }
-          setCreateModalOpen(true);
-        }}
-        className="fixed bottom-24 md:bottom-8 right-8 p-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-transform hover:scale-110 z-40"
-        aria-label="新規投稿"
-      >
-        <FaPlus className="w-6 h-6" />
-      </button>
     </div>
   );
 }

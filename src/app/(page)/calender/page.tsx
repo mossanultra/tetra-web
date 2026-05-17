@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CalendarWidget } from "@/src/features/calendar/components/CalendarWidget";
 import { getMyself } from "@/src/features/user/api/getMyself";
 import { FaCalendarAlt } from "react-icons/fa";
@@ -149,116 +150,82 @@ const CalendarTimelinePage = () => {
     });
   };
 
+  const router = useRouter();
+  
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-4">
-        {/* ヘッダー */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-            <FaCalendarAlt className="text-blue-500" />
-            カレンダー検索
-          </h1>
-          <p className="text-gray-600 text-sm">
-            期間を選択してスレッドを検索できます
-          </p>
+    <div className="absolute inset-0 flex flex-col bg-white md:max-w-2xl md:mx-auto md:w-full md:border-x md:border-gray-200 md:shadow-sm">
+      {/* Header */}
+      <div className="flex-shrink-0 px-4 py-3 flex items-center gap-3 border-b border-gray-100">
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-brand-pale">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="3" width="12" height="11" rx="2" stroke="#1A6B5A" strokeWidth="1.3" />
+            <path d="M2 7h12M6 2v2M10 2v2" stroke="#1A6B5A" strokeWidth="1.3" strokeLinecap="round" />
+          </svg>
+        </div>
+        <h1 className="text-base font-black">カレンダー検索</h1>
+      </div>
+      <p className="text-xs text-gray-400 px-4 pt-2">期間を選択してスレッドを検索できます</p>
+
+      <div className="flex-1 overflow-y-auto">
+        {/* Calendar Widget */}
+        <div className="px-3 pt-3">
+          <CalendarWidget value={dateRange} onChange={handleDateChange} />
+          
+          {dateRange && (
+            <div className="flex justify-end px-2 mt-2">
+              <button
+                onClick={resetSelection}
+                className="text-xs text-brand font-bold"
+              >
+                選択をクリア
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* カレンダーセクション */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-            {/* 選択期間表示 */}
-            {dateRange && (
-              <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="text-sm text-blue-700 font-medium mb-1">
-                  選択期間
-                </div>
-                <div className="text-gray-900">{getSelectedDateRange()}</div>
-                <button
-                  onClick={resetSelection}
-                  className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  選択をクリア
-                </button>
-              </div>
+        {/* Search Results */}
+        <div className="px-4 pt-5 pb-4">
+          <p className="text-sm font-black mb-3">検索結果 {threads.length > 0 ? `(${threads.length})` : ""}</p>
+          
+          <div className="space-y-2">
+            {/* Loading */}
+            {loading && <div className="animate-pulse flex space-x-4"><div className="flex-1 space-y-4 py-1"><div className="h-4 bg-gray-200 rounded w-3/4"></div></div></div>}
+            
+            {/* Empty State */}
+            {!loading && dateRange && threads.length === 0 && (
+              <p className="text-xs text-gray-500 py-4 text-center bg-gray-50 rounded-xl">スレッドが見つかりませんでした</p>
+            )}
+            
+            {!loading && !dateRange && (
+               <p className="text-xs text-gray-400 py-4 text-center">カレンダーから日付を選択してください</p>
             )}
 
-            {/* カレンダー */}
-            <CalendarWidget value={dateRange} onChange={handleDateChange} />
-          </div>
-
-          {/* スレッド一覧セクション */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900">検索結果</h2>
-              {threads.length > 0 && (
-                <p className="text-sm text-gray-600 mt-1">
-                  {threads.length}件のスレッドが見つかりました
-                </p>
-              )}
-            </div>
-
-            <div className="overflow-y-auto max-h-[600px]">
-              {/* エラー */}
-              {error && (
-                <div className="m-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">
-                  {error}
+            {/* Results List */}
+            {threads.map((thread) => {
+              const d = new Date(thread.createdAt);
+              const dateStr = `${d.getMonth() + 1}月${d.getDate()}日`;
+              const tagColor = thread.category === "event" ? "#f83600" : "#3b82f6";
+              
+              return (
+                <div 
+                  key={thread.threadId} 
+                  onClick={() => router.push(`/timeline/${thread.threadId}`)}
+                  className="flex gap-3 items-start p-3.5 bg-gray-50 rounded-xl cursor-pointer active:opacity-70 transition"
+                >
+                  <div className="w-1 self-stretch rounded-full flex-shrink-0" style={{ background: tagColor }}></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold truncate">{thread.threadName}</p>
+                    <p className="text-xs text-gray-400 mt-0.5 truncate">{dateStr} · {thread.ownerUserProfile.userName}</p>
+                  </div>
+                  <svg className="text-gray-300 flex-shrink-0 mt-0.5" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </div>
-              )}
-
-              {/* ローディング */}
-              {loading && <ThreadSkeleton count={3} />}
-
-              {/* 選択前メッセージ */}
-              {!loading && !dateRange && (
-                <div className="text-center text-gray-500 py-20 px-4">
-                  <FaCalendarAlt className="mx-auto text-4xl mb-4 text-gray-300" />
-                  <p>カレンダーから期間を選択してください</p>
-                </div>
-              )}
-
-              {/* 結果なし */}
-              {!loading && dateRange && threads.length === 0 && (
-                <div className="text-center text-gray-500 py-20 px-4">
-                  <p>選択期間にスレッドが見つかりませんでした</p>
-                </div>
-              )}
-
-              {/* スレッド一覧 */}
-              <div className="divide-y divide-gray-200">
-                {threads.map((thread) => (
-                  <ThreadCard
-                    key={thread.threadId}
-                    thread={thread}
-                    onReply={handleReply}
-                    onImageClick={setOpenImage}
-                    isBookmarked={bookmarkedThreads.has(thread.threadId)}
-                    onToggleBookmark={toggleBookmark}
-                    isCompact={true}
-                    currentUserId={userId}
-                    onDeleted={() => {
-                      console.log("delete");
-                    }}
-                    onReport={() => {
-                      console.log("Reported thread:", thread.threadId);
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </div>
-
-      {/* 返信モーダル */}
-      <ReplyModal
-        isOpen={replyModalOpen}
-        replyTarget={replyTarget}
-        onClose={closeReplyModal}
-        onSubmit={submitReply}
-      />
-
-      {/* 画像モーダル */}
-      <ImageModal imageUrl={openImage} onClose={() => setOpenImage(null)} />
     </div>
   );
 };

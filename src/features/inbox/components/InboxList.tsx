@@ -90,47 +90,47 @@ export const InboxList: React.FC = () => {
   }
 
   return (
-    <div className="bg-white min-h-screen pb-10">
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-gray-900">受信トレイ</h1>
-          <span className="text-sm text-gray-500">{messages.length}件</span>
-        </div>
+    <div className="absolute inset-0 flex flex-col bg-white md:max-w-2xl md:mx-auto md:w-full md:border-x md:border-gray-200 md:shadow-sm">
+      <div className="flex-shrink-0 px-4 py-3 flex items-center gap-3 border-b border-gray-100">
+        <h1 className="text-xl font-black flex-1">通知</h1>
         <button
           onClick={markAllAsRead}
           disabled={isMarking || messages.length === 0}
-          className="text-sm text-blue-600 hover:text-blue-700 disabled:opacity-50 font-medium px-3 py-1.5 rounded-full hover:bg-blue-50 transition"
+          className="text-xs font-bold rounded-full px-3 py-1 border transition-colors disabled:opacity-50"
+          style={{ color: "#1A6B5A", borderColor: "#1A6B5A" }}
         >
-          すべて既読にする
+          すべて既読
         </button>
       </div>
 
-      <InfiniteScroll
-        dataLength={messages.length}
-        next={loadMore}
-        hasMore={hasMore}
-        scrollableTarget="scrollableDiv"
-        loader={
-          <div className="flex justify-center items-center py-6">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500" />
+      <div className="flex-1 overflow-y-auto" id="scrollableDiv">
+        <InfiniteScroll
+          dataLength={messages.length}
+          next={loadMore}
+          hasMore={hasMore}
+          scrollableTarget="scrollableDiv"
+          loader={
+            <div className="flex justify-center items-center py-6">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand" />
+            </div>
+          }
+          endMessage={
+            <div className="p-8 text-center text-gray-500 text-sm">
+              すべての通知を表示しました
+            </div>
+          }
+        >
+          <div className="divide-y divide-gray-50">
+            {messages.map((message) => (
+              <InboxItem
+                key={message.messageId}
+                message={message}
+                onDelete={deleteMessage}
+              />
+            ))}
           </div>
-        }
-        endMessage={
-          <div className="p-8 text-center text-gray-500 text-sm">
-            すべてのメッセージを表示しました
-          </div>
-        }
-      >
-        <div className="divide-y divide-gray-100">
-          {messages.map((message) => (
-            <InboxItem
-              key={message.messageId}
-              message={message}
-              onDelete={deleteMessage}
-            />
-          ))}
-        </div>
-      </InfiniteScroll>
+        </InfiniteScroll>
+      </div>
     </div>
   );
 };

@@ -76,36 +76,44 @@ export default function ThreadClient({
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-2xl mx-auto border-x border-gray-200 min-h-screen">
+    <div className="absolute inset-0 flex flex-col bg-gray-50 md:max-w-2xl md:mx-auto md:w-full md:border-x md:border-gray-200 md:bg-white md:shadow-sm">
+      <div className="flex-shrink-0 bg-white px-4 py-3 flex items-center gap-3 border-b border-gray-100 sticky top-0 z-20">
+        <button onClick={() => router.back()} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 transition-colors hover:bg-gray-200">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 4L6 8l4 4" stroke="#374151" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <h1 className="text-sm font-black flex-1">スレッド詳細</h1>
+      </div>
+
+      <div className="flex-1 overflow-y-auto">
         {error && (
           <div className="m-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
             {error}
           </div>
         )}
 
-        {/* {loading && <ThreadSkeleton count={3} />} */}
-
         {!loading && thread && (
-          <ThreadCard
-            thread={thread}
-            onReply={handleReply}
-            onImageClick={setOpenImage}
-            isBookmarked={bookmarkedThreads.has(thread.threadId)}
-            onToggleBookmark={toggleBookmark}
-            isCompact={false}
-            currentUserId={ownUserId}
-            onDeleted={handleDeleted}
-            onReport={() => {
-              console.log("Reported thread:", thread.threadId);
-            }}
-          />
+          <div className="mb-2">
+            <ThreadCard
+              thread={thread}
+              onReply={handleReply}
+              onImageClick={setOpenImage}
+              isBookmarked={bookmarkedThreads.has(thread.threadId)}
+              onToggleBookmark={toggleBookmark}
+              isCompact={false}
+              currentUserId={ownUserId}
+              onDeleted={handleDeleted}
+              onReport={() => console.log("Reported thread:", thread.threadId)}
+            />
+          </div>
         )}
 
         {!loading && thread && childThreads.length > 0 && (
-          <div className="divide-y divide-gray-200">
+          <div className="bg-white pb-6 pt-2 space-y-4">
+            <div className="px-4 text-xs font-bold text-gray-400 mb-2">返信 ({childThreads.length})</div>
             {childThreads.map((child) => (
-              <div key={child.threadId} className="pl-10">
+              <div key={child.threadId} className="px-4">
                 <ThreadCard
                   thread={child}
                   onReply={handleReply}
@@ -113,10 +121,9 @@ export default function ThreadClient({
                   isBookmarked={bookmarkedThreads.has(child.threadId)}
                   onToggleBookmark={toggleBookmark}
                   isCompact
+                  isChild
                   currentUserId={ownUserId}
-                  onReport={() => {
-                    console.log("Reported thread:", child.threadId);
-                  }}
+                  onReport={() => console.log("Reported thread:", child.threadId)}
                   onDeleted={handleDeleted}
                 />
               </div>

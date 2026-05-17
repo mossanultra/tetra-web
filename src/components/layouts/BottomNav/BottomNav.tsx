@@ -15,11 +15,13 @@ import {
   useLoginMode,
   LoginMode,
 } from "@/src/features/user/hooks/useLoginMode";
+import { useModals } from "@/src/contexts/ModalContext";
 
 const BottomNav: React.FC = () => {
   const pathname = usePathname();
   const { getLoginMode } = useLoginMode();
   const [isGuest, setIsGuest] = useState<boolean>(true);
+  const { openPost } = useModals();
 
   useEffect(() => {
     const checkMode = async () => {
@@ -31,33 +33,14 @@ const BottomNav: React.FC = () => {
 
   const { unreadCount } = useInboxContext();
 
-  const navItems = [
-    {
-      label: "マップ",
-      href: "/map",
-      icon: FaMapMarkerAlt,
-    },
-    {
-      label: "通知",
-      href: "/inbox",
-      icon: FaBell,
-      badge: unreadCount > 0 ? unreadCount : undefined,
-    },
-    {
-      label: "タイムライン",
-      href: "/timeline",
-      icon: FaHome,
-    },
-    {
-      label: "カレンダー",
-      href: "/calender",
-      icon: FaCalendarAlt,
-    },
-    {
-      label: "マイページ",
-      href: "/profile/@self",
-      icon: FaUser,
-    },
+  // Create two halves of nav items to place the FAB in the center
+  const leftNavItems = [
+    { label: "マップ", href: "/map", icon: FaMapMarkerAlt },
+    { label: "タイムライン", href: "/timeline", icon: FaHome },
+  ];
+  const rightNavItems = [
+    { label: "カレンダー", href: "/calender", icon: FaCalendarAlt },
+    { label: "マイページ", href: "/profile/@self", icon: FaUser },
   ];
 
   const isActive = (href: string) => {
@@ -67,35 +50,61 @@ const BottomNav: React.FC = () => {
     return pathname?.startsWith(href);
   };
 
-  return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-inset-bottom">
-      <div className="flex justify-around items-center h-16 px-2">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.href);
+  const renderNavItem = (item: any) => {
+    const Icon = item.icon;
+    const active = isActive(item.href);
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        className="flex flex-col items-center justify-center flex-1 h-full relative cursor-pointer"
+      >
+        <div className="relative flex items-center justify-center mb-1">
+          <Icon size={20} className={active ? "text-brand" : "text-gray-400"} />
+          {item.badge !== undefined && item.badge > 0 && (
+            <span className="absolute -top-1 -right-1.5 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white text-white text-[8px] flex items-center justify-center font-bold">
+              {item.badge > 99 ? "99+" : item.badge}
+            </span>
+          )}
+        </div>
+        <span
+          className={`text-[9px] ${
+            active ? "text-brand font-bold" : "text-gray-400 font-normal"
+          }`}
+        >
+          {item.label}
+        </span>
+      </Link>
+    );
+  };
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center justify-center flex-1 h-full relative transition-colors ${
-                active ? "text-blue-600" : "text-gray-600"
-              }`}
-            >
-              <div className="relative">
-                <Icon className="text-xl" />
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-                    {item.badge > 99 ? "99+" : item.badge}
-                  </span>
-                )}
-              </div>
-              <span className="text-[10px] mt-1 font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
+  return (
+    <div className="flex-shrink-0 relative md:hidden bg-white border-t border-gray-100 z-30 overflow-visible safe-area-inset-bottom">
+      {/* Floating Action Button */}
+      <button
+        onClick={openPost}
+        className="absolute left-1/2 flex flex-col items-center shadow-lg transition-transform hover:scale-105 active:scale-95"
+        style={{ transform: "translate(-50%, -52%)", top: 0, zIndex: 31 }}
+      >
+        <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-tr from-brand to-brand-mid">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 4v16M4 12h16" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        </div>
+      </button>
+
+      <div className="flex justify-around items-center h-[56px]">
+        {leftNavItems.map(renderNavItem)}
+        
+        {/* Placeholder for center FAB */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-0.5">
+          <div style={{ width: 22, height: 22 }}></div>
+          <span className="text-[9px] text-gray-400">投稿</span>
+        </div>
+        
+        {rightNavItems.map(renderNavItem)}
       </div>
-    </nav>
+    </div>
   );
 };
 

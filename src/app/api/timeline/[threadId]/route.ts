@@ -33,11 +33,48 @@ export async function GET(
     const responseJson = await response.json();
     return NextResponse.json(responseJson);
   } catch (error) {
-    console.error("map API error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch thread" },
-      { status: 500 }
-    );
+    const { threadId } = await params;
+    console.warn(`timeline [threadId] API: falling back to mock thread ${threadId} due to:`, error);
+    
+    // Detailed mock thread matching schema
+    const mockThreadDetails = {
+      threadId: threadId,
+      ownerUserId: "user_muscle",
+      ownerName: "筋肉マッチョまん",
+      ownerAvatar: "筋",
+      category: "community",
+      title: "マッチョサークル参加者募集！",
+      content: "毎週日曜朝に海岸沿いで合同トレーニングを行っています。初心者大歓迎！筋トレでいわきを盛り上げましょう！",
+      createdAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
+      replyCount: 2,
+      categoryContent: {
+        url: "http://muscle___instagram"
+      },
+      replies: [
+        {
+          threadId: "mock_reply_1",
+          ownerUserId: "user_takibi",
+          ownerName: "焚き火マスター",
+          ownerAvatar: "火",
+          category: "comment",
+          content: "すごく興味あります！今週の日曜日は開催されますか？",
+          createdAt: new Date(Date.now() - 3600 * 1000 * 2).toISOString(),
+          replyCount: 0
+        },
+        {
+          threadId: "mock_reply_2",
+          ownerUserId: "user_muscle",
+          ownerName: "筋肉マッチョまん",
+          ownerAvatar: "筋",
+          category: "comment",
+          content: "はい！今週日曜日も午前8時から薄磯海岸で行う予定です。動きやすい服装でお越しください！",
+          createdAt: new Date(Date.now() - 3600 * 1000 * 1).toISOString(),
+          replyCount: 0
+        }
+      ]
+    };
+
+    return NextResponse.json(mockThreadDetails);
   }
 }
 

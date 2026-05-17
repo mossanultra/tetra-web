@@ -1,6 +1,7 @@
 import React from "react";
 import LayoutContent from "./LayoutContent";
 import { SessionProvider } from "next-auth/react";
+import { ModalProvider } from "@/src/contexts/ModalContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,9 +9,11 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <LayoutContent>
-      <SessionProvider>{children}</SessionProvider>
-    </LayoutContent>
+    <ModalProvider>
+      <LayoutContent>
+        <SessionProvider>{children}</SessionProvider>
+      </LayoutContent>
+    </ModalProvider>
   );
 };
 

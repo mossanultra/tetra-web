@@ -35,6 +35,15 @@ const ProfilePage: React.FC = () => {
     fetchProfile,
   } = useProfile(userId, { enabled: isGuest === false });
 
+  // デバッグ用のログ追加
+  useEffect(() => {
+    if (data) {
+      console.log("[ProfilePage DEBUG] Route userId:", userId);
+      console.log("[ProfilePage DEBUG] Profile profileId:", data.profileId);
+      console.log("[ProfilePage DEBUG] isOwnProfile:", isOwnProfile);
+    }
+  }, [userId, data, isOwnProfile]);
+
   useEffect(() => {
     if (isGuest === false) {
       fetchProfile();
@@ -126,89 +135,107 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-xl mx-auto">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-extrabold tracking-tight">
-            プロフィール
-          </h2>
-        </div>
-
-        <div className="flex flex-col gap-8">
-          {/* Profile Image */}
-          <div className="flex flex-col items-center gap-4">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 bg-gray-100 flex items-center justify-center">
-              {data.imageUrl ? (
-                <Image
-                  src={data.imageUrl}
-                  alt={data.userName}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <FaUser className="text-gray-400 text-5xl" />
-              )}
-            </div>
+    <div className="absolute inset-0 flex flex-col bg-gray-50 md:max-w-2xl md:mx-auto md:w-full md:border-x md:border-gray-200 md:bg-white md:shadow-sm">
+      
+      {isOwnProfile ? (
+        <>
+          <div className="flex-shrink-0 bg-white px-4 py-3 flex items-center justify-between border-b border-gray-100 sticky top-0 z-10">
+            <h1 className="text-base font-black">マイページ</h1>
+            <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="4" r="1.3" fill="#374151"/><circle cx="8" cy="8" r="1.3" fill="#374151"/><circle cx="8" cy="12" r="1.3" fill="#374151"/></svg>
+            </button>
           </div>
-
-          {/* Profile Info */}
-          <div className="space-y-6">
-            {/* Nickname */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                ニックネーム
-              </label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900">
-                {data.userName || "未設定"}
+          <div className="flex-1 overflow-y-auto">
+            <div className="bg-white px-4 pt-7 pb-5 flex flex-col items-center border-b-4 border-gray-50">
+              <div className="w-20 h-20 rounded-full bg-gray-200 border-4 border-white shadow-md flex items-center justify-center mb-5 overflow-hidden relative">
+                {data.imageUrl ? (
+                  <Image src={data.imageUrl} alt={data.userName} fill className="object-cover" unoptimized />
+                ) : (
+                  <svg width="36" height="36" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="18" r="10" fill="#9CA3AF"/><path d="M6 44c0-10 8-17 18-17s18 7 18 17" fill="#9CA3AF"/></svg>
+                )}
               </div>
-            </div>
-
-            {/* URL */}
-            {data.url && (
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  URL
-                </label>
-                <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
-                  <a
-                    href={data.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-2"
-                  >
-                    <FaLink className="text-sm" />
-                    {data.url}
-                  </a>
+              <div className="w-full space-y-2.5 mb-5">
+                <div className="bg-gray-50 rounded-xl px-4 py-3">
+                  <p className="text-xs text-gray-400 mb-0.5">ニックネーム</p>
+                  <p className="text-sm font-bold">{data.userName || "未設定"}</p>
+                </div>
+                {/* Note: Belonging/Affiliation is not in the data model yet, so skipping or mocking */}
+                <div className="bg-gray-50 rounded-xl px-4 py-3">
+                  <p className="text-xs text-gray-400 mb-0.5">マイリンク</p>
+                  {data.url ? (
+                    <a href={data.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium break-all text-brand">{data.url}</a>
+                  ) : (
+                    <p className="text-sm text-gray-400">未設定</p>
+                  )}
+                </div>
+                <div className="bg-gray-50 rounded-xl px-4 py-3">
+                  <p className="text-xs text-gray-400 mb-0.5">自己紹介</p>
+                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{data.introduction || "未設定"}</p>
                 </div>
               </div>
-            )}
-
-            {/* Bio */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                自己紹介
-              </label>
-              <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 whitespace-pre-wrap min-h-[100px]">
-                {data.introduction || "未設定"}
+              <button onClick={() => router.push("/profile/edit")} className="w-full h-11 bg-gray-900 text-white rounded-xl text-sm font-bold">プロフィールを編集</button>
+            </div>
+            
+            <div className="bg-white mt-2">
+              <div className="flex border-b border-gray-100">
+                <button className="flex-1 py-3 text-xs font-bold border-b-2 text-brand border-brand">過去の投稿</button>
+                <button className="flex-1 py-3 text-xs font-bold border-b-2 border-transparent text-gray-400">保存した投稿</button>
+                <button className="flex-1 py-3 text-xs font-bold border-b-2 border-transparent text-gray-400">フォロー中</button>
+              </div>
+              {/* Dummy List to match layout since we don't have user's posts yet */}
+              <div className="px-4 pt-4 pb-3 space-y-2.5">
+                <div className="flex flex-col items-center justify-center py-10 text-gray-400 gap-2">
+                  <span className="text-3xl">📭</span>
+                  <p className="text-sm">まだ投稿がありません</p>
+                </div>
               </div>
             </div>
-
-            {/* Edit Button (only for own profile) */}
-            {isOwnProfile && (
-              <div className="pt-6">
-                <button
-                  type="button"
-                  onClick={() => router.push("/profile/edit")}
-                  className="w-full flex justify-center items-center px-4 py-3 text-sm font-bold text-white bg-neutral-900 rounded-xl hover:bg-neutral-800 transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-100"
-                >
-                  プロフィールを編集
-                </button>
-              </div>
-            )}
+            <div className="h-4"></div>
           </div>
-        </div>
-      </div>
+        </>
+      ) : (
+        <>
+          <div className="flex-shrink-0 bg-white px-4 py-3 flex items-center gap-3 border-b border-gray-100 sticky top-0 z-10">
+            <button onClick={() => router.back()} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#374151" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            <h1 className="text-sm font-black flex-1">投稿者プロフィール</h1>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <div className="bg-white px-4 pt-7 pb-6 flex flex-col items-center border-b-4 border-gray-50">
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-black mb-3 shadow-md overflow-hidden relative bg-brand">
+                {data.imageUrl ? (
+                  <Image src={data.imageUrl} alt={data.userName} fill className="object-cover" unoptimized />
+                ) : (
+                  <span>{data.userName?.[0] || "👤"}</span>
+                )}
+              </div>
+              <p className="text-base font-black mb-1">{data.userName}</p>
+              <p className="text-xs text-gray-400 mb-4">ユーザー</p>
+              <p className="text-sm text-gray-600 text-center leading-relaxed px-2 whitespace-pre-wrap">{data.introduction}</p>
+              <button className="mt-4 px-8 py-2 rounded-full text-sm font-bold bg-brand text-white">フォローする</button>
+            </div>
+            <div className="bg-white mt-2 px-4 py-1">
+              <div className="flex gap-3 items-center py-3.5 border-b border-gray-50">
+                <span className="text-xs text-gray-400 w-20 flex-shrink-0">マイリンク</span>
+                {data.url ? (
+                  <a href={data.url} target="_blank" rel="noopener noreferrer" className="text-sm flex-1 truncate text-brand">{data.url}</a>
+                ) : (
+                  <span className="text-sm flex-1 text-gray-400">未設定</span>
+                )}
+              </div>
+            </div>
+            <div className="bg-white mt-2 px-4 pt-3 pb-3">
+              <p className="text-xs font-black text-gray-400 mb-3">この投稿者の投稿</p>
+              <div className="flex flex-col items-center justify-center py-8 text-gray-400 gap-2 bg-gray-50 rounded-xl">
+                <span className="text-2xl">📭</span>
+                <p className="text-xs">投稿はありません</p>
+              </div>
+            </div>
+            <div className="h-4"></div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

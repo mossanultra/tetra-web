@@ -45,7 +45,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans text-gray-900 flex flex-col md:flex-row select-none bg-white md:bg-gray-50 overflow-hidden antialiased`}
+        style={{ height: "100dvh" }}
       >
         <ProfileProvider>
           <InboxProvider>

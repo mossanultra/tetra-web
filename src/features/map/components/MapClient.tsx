@@ -94,7 +94,23 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
   };
 
   return (
-    <>
+    <div className="absolute inset-0 flex flex-col md:max-w-2xl md:mx-auto md:w-full md:border-x md:border-gray-200 md:shadow-sm">
+      
+      {/* Map Header (Mobile only) */}
+      <div className="absolute top-4 left-4 z-20 md:hidden flex gap-2">
+        <button className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-gray-700">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
+      </div>
+      <div className="absolute top-4 right-4 z-20 md:hidden flex gap-2">
+        <button onClick={() => router.push('/inbox')} className="relative w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-gray-700">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M11 2C7.7 2 5 4.7 5 8V14L3.5 15.5V16H18.5V15.5L17 14V8C17 4.7 14.3 2 11 2Z" stroke="currentColor" strokeWidth="1.5"/><path d="M9 16C9 17.1 9.9 18 11 18S13 17.1 13 16" stroke="currentColor" strokeWidth="1.5"/></svg>
+        </button>
+        <button onClick={() => router.push('/profile/@self')} className="w-10 h-10 rounded-full bg-white shadow-md overflow-hidden border-2 border-white">
+          <img src="/default-user.png" className="w-full h-full object-cover" alt="User" />
+        </button>
+      </div>
+
       <PinCreationDialog
         isOpen={pinCreation.pinModalOpen}
         pendingPin={pinCreation.pendingPin}
@@ -107,70 +123,82 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
         onCancel={pinCreation.cancelPin}
       />
 
-      <GoogleMap
-        mapContainerStyle={MAP_CONTAINER_STYLE}
-        center={center}
-        zoom={zoom}
-        onLoad={onMapLoad}
-        options={{
-          disableDefaultUI: true,
-          gestureHandling: "greedy",
-          mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "",
-        }}
-        onClick={(e) => {
-          if (activeId) {
-            setActiveId(null);
-            return;
-          }
-
-          pinCreation.handleMapClick(e);
-        }}
-      >
-        {pointList?.map((p) => (
-          <React.Fragment key={p.id}>
-            <Marker
-              position={{ lat: p.lat, lng: p.lng }}
-              onClick={() => handleMarkerClick(p)}
-              icon={{
-                url:
-                  p.category === "event"
-                    ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                    : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-              }}
-            />
-
-            {activeId === p.id && (
-              <OverlayView
-                position={{ lat: p.lat, lng: p.lng }}
-                mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-              >
-                <div style={{ transform: "translate(20px, -50%)" }}>
-                  <MarkerDetailDialog
-                    point={p}
-                    isOpen={pinDetailModalOpen}
-                    onClose={() => {
-                      setActiveId(null);
-                      setPinDetailModalOpen(false);
-                    }}
-                    onNavigate={() => router.push(`/timeline/${p.id}`)}
-                  />
-                </div>
-              </OverlayView>
-            )}
-          </React.Fragment>
-        ))}
-
-        <Marker
-          position={center}
-          icon={{
-            url: "/36959.png",
-            scaledSize: new google.maps.Size(
-              USER_MARKER_SIZE,
-              USER_MARKER_SIZE,
-            ),
+      <div className="flex-1 relative z-0">
+        <GoogleMap
+          mapContainerStyle={MAP_CONTAINER_STYLE}
+          center={center}
+          zoom={zoom}
+          onLoad={onMapLoad}
+          options={{
+            disableDefaultUI: true,
+            gestureHandling: "greedy",
+            mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "",
           }}
-        />
-      </GoogleMap>
+          onClick={(e) => {
+            if (activeId) {
+              setActiveId(null);
+              return;
+            }
+            pinCreation.handleMapClick(e);
+          }}
+        >
+          {pointList?.map((p) => {
+            const isEvent = p.category === "event";
+            const color = isEvent ? "#f83600" : "#10B981";
+            const emoji = isEvent ? "🔥" : "📍";
+            
+            return (
+              <React.Fragment key={p.id}>
+                <OverlayView
+                  position={{ lat: p.lat, lng: p.lng }}
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <div 
+                    className="map-pin-wrap" 
+                    onClick={() => handleMarkerClick(p)}
+                  >
+                    <div className="bg-white rounded-md shadow px-1.5 py-0.5 text-[10px] font-bold mb-1 whitespace-nowrap">
+                      {p.threadName}
+                    </div>
+                    <div className="map-pin-circle" style={{ background: color }}>{emoji}</div>
+                    <div className="map-pin-tail" style={{ borderTop: `10px solid ${color}` }}></div>
+                  </div>
+                </OverlayView>
+
+                {activeId === p.id && (
+                  <OverlayView
+                    position={{ lat: p.lat, lng: p.lng }}
+                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                  >
+                    <div style={{ transform: "translate(20px, -50%)" }}>
+                      <MarkerDetailDialog
+                        point={p}
+                        isOpen={pinDetailModalOpen}
+                        onClose={() => {
+                          setActiveId(null);
+                          setPinDetailModalOpen(false);
+                        }}
+                        onNavigate={() => router.push(`/timeline/${p.id}`)}
+                      />
+                    </div>
+                  </OverlayView>
+                )}
+              </React.Fragment>
+            );
+          })}
+
+          <Marker
+            position={center}
+            icon={{
+              url: "/36959.png",
+              scaledSize: new google.maps.Size(
+                USER_MARKER_SIZE,
+                USER_MARKER_SIZE,
+              ),
+            }}
+          />
+        </GoogleMap>
+      </div>
 
       <SignUpPromptDialog
         isOpen={isOpen}
@@ -178,6 +206,6 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
         title="ピンを作成するにはアカウントが必要です"
         message="アカウントを作成すると、マップ上にお気に入りの場所をピン留めしたり、新しいスレッドを開始したりできるようになります。"
       />
-    </>
+    </div>
   );
 };

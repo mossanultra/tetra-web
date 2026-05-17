@@ -151,98 +151,76 @@ const ProfileEditPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-xl mx-auto">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-extrabold tracking-tight">
-            プロフィール編集
-          </h2>
-        </div>
+    <div className="absolute inset-0 flex flex-col bg-gray-50 md:max-w-2xl md:mx-auto md:w-full md:border-x md:border-gray-200 md:bg-white md:shadow-sm">
+      <div className="flex-shrink-0 bg-white px-4 py-3 flex items-center gap-3 border-b border-gray-100 sticky top-0 z-10">
+        <button onClick={handleCancel} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#374151" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
+        <h1 className="text-sm font-black flex-1">プロフィールを編集</h1>
+      </div>
 
+      <div className="flex-1 overflow-y-auto px-4 py-5 bg-white">
         {displayError && (
           <div className="mb-6">
             <AlertMessage message={displayError} type="error" />
           </div>
         )}
 
-        <div className="flex flex-col gap-8">
-          <ProfileImageUpload
-            imagePreview={imagePreview}
-            onImageChange={handleImageChange}
-            onImageRemove={handleImageRemove}
-            disabled={false}
-            onError={(msg) => setError(msg)}
-          />
-
-          <div className="space-y-6">
-            <FormInput
-              label="ニックネーム"
-              name="nickname"
-              value={userData.nickname}
-              onChange={handleChange}
-              placeholder="あなたのニックネーム"
+        <div className="flex flex-col gap-6">
+          <div className="flex justify-center mb-2">
+            <ProfileImageUpload
+              imagePreview={imagePreview}
+              onImageChange={handleImageChange}
+              onImageRemove={handleImageRemove}
               disabled={false}
-              icon={
-                <svg
-                  className="h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              }
+              onError={(msg) => setError(msg)}
             />
-            <FormInput
-              label="URL"
-              name="url"
-              value={userData.url}
-              onChange={handleChange}
-              placeholder=""
-              disabled={false}
-            />
+          </div>
 
-            <FormTextarea
-              label="自己紹介"
-              name="bio"
-              value={userData.bio}
-              onChange={handleChange}
-              placeholder="あなたについて簡単に教えてください..."
-              disabled={false}
-            />
-
-            <div className="pt-6">
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                  className="flex-1 px-4 py-3 text-sm font-bold bg-white border border-gray-300 rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-100 transition-all disabled:opacity-50"
-                >
-                  キャンセル
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={isLoading}
-                  className={`flex-1 flex justify-center items-center px-4 py-3 text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed`}
-                >
-                  {isLoading ? (
-                    <>
-                      <span className="inline-block w-5 h-5 mr-3 border-2 border-white/30 rounded-full border-t-white animate-spin"></span>
-                      保存中...
-                    </>
-                  ) : (
-                    <>保存する</>
-                  )}
-                </button>
-              </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">ニックネーム</label>
+              <input 
+                type="text" 
+                name="nickname"
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-gray-400 transition" 
+                value={userData.nickname}
+                onChange={handleChange}
+                placeholder="ニックネーム"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">マイリンク</label>
+              <input 
+                type="text" 
+                name="url"
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-gray-400 transition" 
+                value={userData.url}
+                onChange={handleChange}
+                placeholder="https://..."
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">自己紹介</label>
+              <textarea 
+                name="bio"
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-gray-400 h-24 resize-none transition"
+                value={userData.bio}
+                onChange={handleChange}
+                placeholder="よろしくお願いします"
+              />
             </div>
           </div>
+
+          <button 
+            type="button"
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="w-full h-11 text-white rounded-xl text-sm font-bold mt-2 shadow-md bg-brand disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
+          >
+            {isLoading && <span className="w-4 h-4 border-2 border-white/30 rounded-full border-t-white animate-spin"></span>}
+            保存して戻る
+          </button>
         </div>
       </div>
 

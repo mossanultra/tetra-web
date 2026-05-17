@@ -78,33 +78,33 @@ export const CalendarWidget = ({ value, onChange }: CalendarWidgetProps) => {
           background-color: #f3f4f6;
         }
         .react-calendar__tile--now {
-          background-color: #dbeafe;
-          color: #1e40af;
+          background-color: #E8F5F2;
+          color: #1A6B5A;
           font-weight: 600;
         }
         .react-calendar__tile--now:enabled:hover,
         .react-calendar__tile--now:enabled:focus {
-          background-color: #bfdbfe;
+          background-color: #d1eee7;
         }
         .react-calendar__tile--active {
-          background-color: #3b82f6 !important;
+          background-color: #1A6B5A !important;
           color: white !important;
           font-weight: 600;
         }
         .react-calendar__tile--active:enabled:hover,
         .react-calendar__tile--active:enabled:focus {
-          background-color: #2563eb !important;
+          background-color: #135245 !important;
           color: white !important;
           font-weight: 600;
         }
         .react-calendar__tile--rangeStart,
         .react-calendar__tile--rangeEnd {
-          background-color: #3b82f6 !important;
+          background-color: #1A6B5A !important;
           color: white !important;
         }
         .react-calendar__tile--range {
-          background-color: #dbeafe !important;
-          color: #1e40af !important;
+          background-color: #E8F5F2 !important;
+          color: #1A6B5A !important;
         }
         .react-calendar__month-view__days__day--neighboringMonth {
           color: #d1d5db;
