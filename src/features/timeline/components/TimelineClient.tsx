@@ -17,6 +17,8 @@ import {
 } from "@/src/features/user/hooks/useLoginMode";
 import { SignUpPromptDialog } from "@/src/features/user/components/SignUpPromptDialog";
 import { useBookmarks } from "@/src/features/user/hooks/useBookmarks";
+import { useRouter } from "next/navigation";
+import { useInboxContext } from "@/src/contexts/InboxContext";
 
 type Props = {
   initialItems: Thread[];
@@ -32,6 +34,8 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
   const { createThread, submitReply } = useThread();
   const [openImage, setOpenImage] = useState<string | null>(null);
   const { bookmarkedIds: bookmarkedThreads, toggleBookmark } = useBookmarks();
+  const router = useRouter();
+  const { unreadCount } = useInboxContext();
 
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [replyTarget, setReplyTarget] = useState<Thread | null>(null);
@@ -91,11 +95,19 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
         <h1 className="text-base font-black">掲示板</h1>
         <div className="flex gap-2">
           {/* Notification button on mobile timeline */}
-          <button className="md:hidden relative w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+          <button
+            onClick={() => router.push("/inbox")}
+            className="md:hidden relative w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"
+          >
             <svg width="17" height="17" viewBox="0 0 22 22" fill="none">
               <path d="M11 2C7.7 2 5 4.7 5 8V14L3.5 15.5V16H18.5V15.5L17 14V8C17 4.7 14.3 2 11 2Z" stroke="#374151" strokeWidth="1.5" />
               <path d="M9 16C9 17.1 9.9 18 11 18S13 17.1 13 16" stroke="#374151" strokeWidth="1.5" />
             </svg>
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white text-white text-[8px] flex items-center justify-center font-bold animate-pulse">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </button>
         </div>
       </div>

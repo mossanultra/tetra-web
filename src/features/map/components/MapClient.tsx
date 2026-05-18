@@ -18,6 +18,7 @@ import { useLoginMode } from "@/src/features/user/hooks/useLoginMode";
 import { useMapState } from "../hooks/useMapState";
 import { usePinCreation } from "../hooks/usePinCreation";
 import { getPoints } from "@/src/features/point/api/getPoints";
+import { useInboxContext } from "@/src/contexts/InboxContext";
 
 type MapClientProps = {
   zoom: number;
@@ -39,6 +40,7 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const { center, pointList, setPoints } = useMapState();
+  const { unreadCount } = useInboxContext();
 
   // Sign-up prompt dialog
   const { isOpen, openDialog, closeDialog } = useSignUpPrompt();
@@ -105,6 +107,11 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
       <div className="absolute top-4 right-4 z-20 md:hidden flex gap-2">
         <button onClick={() => router.push('/inbox')} className="relative w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-gray-700">
           <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M11 2C7.7 2 5 4.7 5 8V14L3.5 15.5V16H18.5V15.5L17 14V8C17 4.7 14.3 2 11 2Z" stroke="currentColor" strokeWidth="1.5"/><path d="M9 16C9 17.1 9.9 18 11 18S13 17.1 13 16" stroke="currentColor" strokeWidth="1.5"/></svg>
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white text-white text-[8px] flex items-center justify-center font-bold animate-pulse">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
         </button>
         <button onClick={() => router.push('/profile/@self')} className="w-10 h-10 rounded-full bg-white shadow-md overflow-hidden border-2 border-white">
           <img src="/default-user.png" className="w-full h-full object-cover" alt="User" />
