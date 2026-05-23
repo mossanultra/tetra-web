@@ -6,15 +6,10 @@ import { ThreadCard } from "@/src/features/thread/components/ThreadCard";
 import { ReplyModal } from "@/src/features/thread/components/ReplyModal";
 import { ImageModal } from "@/src/features/thread/components/ImageModal";
 import { CreateThreadModal } from "./CreateThreadModal";
-import { FaPlus } from "react-icons/fa";
 import { useTimeline } from "@/src/features/timeline/hooks/useTimeline";
 import { useThread } from "@/src/features/thread/hooks/useThread";
 import { Thread } from "../../thread/types/Thread";
 import { useSignUpPrompt } from "@/src/features/user/hooks/useSignUpPrompt";
-import {
-  useLoginMode,
-  LoginMode,
-} from "@/src/features/user/hooks/useLoginMode";
 import { SignUpPromptDialog } from "@/src/features/user/components/SignUpPromptDialog";
 import { useBookmarks } from "@/src/features/user/hooks/useBookmarks";
 import { useRouter } from "next/navigation";
@@ -41,8 +36,7 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
   const [replyTarget, setReplyTarget] = useState<Thread | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
-  const { isOpen, openDialog, closeDialog } = useSignUpPrompt();
-  const { getLoginMode } = useLoginMode();
+  const { isOpen, closeDialog } = useSignUpPrompt();
 
   const handleReply = (thread: Thread) => {
     setReplyTarget(thread);
@@ -94,6 +88,15 @@ export default function TimelineClient({ initialItems, ownUserId }: Props) {
       <div className="flex-shrink-0 bg-white px-4 py-3 flex items-center justify-between border-b border-gray-100">
         <h1 className="text-base font-black">掲示板</h1>
         <div className="flex gap-2">
+          {/* Search button on mobile timeline */}
+          <button
+            onClick={() => router.push("/search")}
+            className="md:hidden relative w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="#374151" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
           {/* Notification button on mobile timeline */}
           <button
             onClick={() => router.push("/inbox")}
