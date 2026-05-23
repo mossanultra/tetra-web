@@ -113,9 +113,7 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
             </span>
           )}
         </button>
-        <button onClick={() => router.push('/profile/@self')} className="w-10 h-10 rounded-full bg-white shadow-md overflow-hidden border-2 border-white">
-          <img src="/default-user.png" className="w-full h-full object-cover" alt="User" />
-        </button>
+
       </div>
 
       <PinCreationDialog
