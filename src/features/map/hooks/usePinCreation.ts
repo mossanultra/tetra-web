@@ -9,6 +9,7 @@ import { registerChatPoint } from "@/src/features/point/api/registerChatPoint";
 import { getPoints } from "@/src/features/point/api/getPoints";
 import { Point } from "@/src/features/point/types/point";
 import { ConfirmData } from "../components/PinCreationDialog";
+import { PostSheetSubmitData } from "@/src/components/ui/PostSheet";
 
 type Category = "event" | "chat";
 
@@ -130,6 +131,41 @@ export const usePinCreation = (
     }
   };
 
+  const confirmFromSheet = async (data: PostSheetSubmitData) => {
+    if (!pendingPin) return;
+    try {
+      const dateIso = data.date ? new Date(data.date).toISOString() : new Date().toISOString();
+      if (data.genre === "event") {
+        await registerEventPoint({
+          lat: pendingPin.lat,
+          lng: pendingPin.lng,
+          threadName: data.title,
+          category: "event",
+          startDate: dateIso,
+          endDate: dateIso,
+          detail: data.detail || undefined,
+          url: data.url || undefined,
+          imageUrl: data.imageUrl || undefined,
+        });
+      } else {
+        await registerChatPoint({
+          lat: pendingPin.lat,
+          lng: pendingPin.lng,
+          threadName: data.title,
+          category: "chat",
+          imageUrl: data.imageUrl || undefined,
+        });
+      }
+      const newPoints = await getPoints();
+      setPoints(newPoints);
+      setPinModalOpen(false);
+      setPendingPin(null);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
   return {
     pinModalOpen,
     pendingPin,
@@ -140,6 +176,7 @@ export const usePinCreation = (
     setCategory,
     handleMapClick,
     confirmPlacePin,
+    confirmFromSheet,
     cancelPin: () => setPinModalOpen(false),
   };
 };

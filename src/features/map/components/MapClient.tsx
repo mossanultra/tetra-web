@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Point } from "@/src/features/point/types/point";
-import { PinCreationDialog } from "@/src/features/map/components/PinCreationDialog";
+import { PostSheet } from "@/src/components/ui/PostSheet";
 import { MarkerDetailDialog } from "@/src/features/map/components/MarkerDetailDialog";
 import { SignUpPromptDialog } from "@/src/features/user/components/SignUpPromptDialog";
 import { useSignUpPrompt } from "@/src/features/user/hooks/useSignUpPrompt";
@@ -118,16 +118,11 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
         </button>
       </div>
 
-      <PinCreationDialog
+      <PostSheet
         isOpen={pinCreation.pinModalOpen}
-        pendingPin={pinCreation.pendingPin}
-        threadName={pinCreation.threadName}
-        category={pinCreation.category}
-        savingPin={pinCreation.savingPin}
-        onThreadNameChange={pinCreation.setThreadName}
-        onCategoryChange={pinCreation.setCategory}
-        onConfirm={pinCreation.confirmPlacePin}
-        onCancel={pinCreation.cancelPin}
+        onClose={pinCreation.cancelPin}
+        initialLocation={pinCreation.threadName}
+        onSubmit={pinCreation.confirmFromSheet}
       />
 
       <div className="flex-1 relative z-0">
