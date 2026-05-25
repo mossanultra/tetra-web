@@ -1,37 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FaMapMarkerAlt,
-  FaBell,
   FaHome,
   FaCalendarAlt,
   FaUser,
 } from "react-icons/fa";
-import { useInboxContext } from "@/src/contexts/InboxContext";
-import {
-  useLoginMode,
-  LoginMode,
-} from "@/src/features/user/hooks/useLoginMode";
 import { useModals } from "@/src/contexts/ModalContext";
 
 const BottomNav: React.FC = () => {
   const pathname = usePathname();
-  const { getLoginMode } = useLoginMode();
-  const [isGuest, setIsGuest] = useState<boolean>(true);
   const { openPost } = useModals();
-
-  useEffect(() => {
-    const checkMode = async () => {
-      const mode = await getLoginMode();
-      setIsGuest(mode === LoginMode.GUEST);
-    };
-    checkMode();
-  }, [getLoginMode]);
-
-  const { unreadCount } = useInboxContext();
 
   // Create two halves of nav items to place the FAB in the center
   const leftNavItems = [
@@ -83,10 +65,10 @@ const BottomNav: React.FC = () => {
       {/* Floating Action Button */}
       <button
         onClick={openPost}
-        className="absolute left-1/2 flex flex-col items-center shadow-lg transition-transform hover:scale-105 active:scale-95"
+        className="absolute left-1/2 flex flex-col items-center bg-transparent transition-transform hover:scale-105 active:scale-95"
         style={{ transform: "translate(-50%, -52%)", top: 0, zIndex: 31 }}
       >
-        <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-tr from-brand to-brand-mid">
+        <div className="w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-tr from-brand to-brand-mid shadow-lg">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M12 4v16M4 12h16" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
