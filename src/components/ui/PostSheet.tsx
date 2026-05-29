@@ -9,8 +9,7 @@ interface PostSheetProps {
 
 export const PostSheet: React.FC<PostSheetProps> = ({ isOpen, onClose }) => {
   const [isClosing, setIsClosing] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState<{ emoji: string; color: string } | null>(null);
-
+  const [selectedGenre, setSelectedGenre] = useState<string>("イベント・出店");
   if (!isOpen && !isClosing) return null;
 
   const handleClose = () => {
@@ -20,19 +19,6 @@ export const PostSheet: React.FC<PostSheetProps> = ({ isOpen, onClose }) => {
       onClose();
     }, 240); // Matches animation duration
   };
-
-  const icons = [
-    { emoji: "🔥", color: "#F97316" },
-    { emoji: "🎨", color: "#EC4899" },
-    { emoji: "☕", color: "#3B82F6" },
-    { emoji: "🎉", color: "#8B5CF6" },
-    { emoji: "💪", color: "#10B981" },
-    { emoji: "🍜", color: "#1A6B5A" },
-    { emoji: "🌸", color: "#F59E0B" },
-    { emoji: "⚽", color: "#EF4444" },
-    { emoji: "🎵", color: "#6366F1" },
-    { emoji: "🐟", color: "#0EA5E9" },
-  ];
 
   return (
     <div className="fixed inset-0 z-50">
@@ -54,26 +40,28 @@ export const PostSheet: React.FC<PostSheetProps> = ({ isOpen, onClose }) => {
           <div>
             <label className="block text-xs font-bold text-gray-500 mb-2">投稿ジャンル</label>
             <div className="flex gap-2 flex-wrap">
-              <button className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-brand">イベント・出店</button>
-              <button className="px-3.5 py-2 rounded-xl text-xs font-bold bg-gray-100 text-gray-600">お店</button>
-              <button className="px-3.5 py-2 rounded-xl text-xs font-bold bg-gray-100 text-gray-600">コミュニティ</button>
+              {["イベント・出店", "お店", "コミュニティ"].map((genre) => {
+                const isSelected = selectedGenre === genre;
+                return (
+                  <button
+                    key={genre}
+                    onClick={() => setSelectedGenre(genre)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors ${
+                      isSelected
+                        ? "text-white bg-brand"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {genre}
+                  </button>
+                );
+              })}
             </div>
           </div>
           
           <div>
             <label className="block text-xs font-bold text-gray-500 mb-1.5">タイトル</label>
             <input type="text" placeholder="タイトルを入力" className="w-full h-11 border border-gray-200 rounded-xl px-4 text-sm text-gray-700 outline-none bg-white" />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1.5">日付を選択</label>
-              <input type="date" className="w-full h-11 border border-gray-200 rounded-xl px-3 text-sm text-gray-700 outline-none bg-white" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1.5">場所</label>
-              <input type="text" placeholder="地名を入力" className="w-full h-11 border border-gray-200 rounded-xl px-3 text-sm text-gray-700 outline-none bg-white" />
-            </div>
           </div>
           
           <div>
@@ -104,39 +92,6 @@ export const PostSheet: React.FC<PostSheetProps> = ({ isOpen, onClose }) => {
                 </svg>
               </div>
             </div>
-          </div>
-          
-          <div>
-            <label className="block text-xs font-bold text-gray-500 mb-2">マップに表示するアイコン <span className="font-normal text-gray-400">（タップして選択）</span></label>
-            <div className="flex gap-2 flex-wrap">
-              {icons.map((icon, idx) => {
-                const isSelected = selectedIcon?.emoji === icon.emoji;
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedIcon(icon)}
-                    className="w-11 h-11 rounded-full text-xl flex items-center justify-center border-2"
-                    style={{
-                      borderColor: isSelected ? icon.color : "transparent",
-                      background: isSelected ? `${icon.color}22` : "#F9FAFB"
-                    }}
-                  >
-                    {icon.emoji}
-                  </button>
-                );
-              })}
-            </div>
-            {selectedIcon && (
-              <div className="mt-2.5 flex items-center gap-2 fade-in">
-                <div 
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-lg shadow-sm flex-shrink-0"
-                  style={{ background: selectedIcon.color }}
-                >
-                  {selectedIcon.emoji}
-                </div>
-                <p className="text-xs text-gray-500">このアイコンがマップに表示されます</p>
-              </div>
-            )}
           </div>
           
           <button 

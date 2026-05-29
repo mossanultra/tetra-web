@@ -8,7 +8,7 @@ import { registerEventPoint } from "@/src/features/point/api/registerEventPoint"
 import { registerChatPoint } from "@/src/features/point/api/registerChatPoint";
 import { getPoints } from "@/src/features/point/api/getPoints";
 import { Point } from "@/src/features/point/types/point";
-import { ConfirmData } from "../components/PinCreationDialog";
+import { ConfirmData } from "../components/MapPostSheet";
 
 type Category = "event" | "chat";
 

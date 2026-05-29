@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Point } from "@/src/features/point/types/point";
-import { PinCreationDialog } from "@/src/features/map/components/PinCreationDialog";
+import { MapPostSheet } from "@/src/features/map/components/MapPostSheet";
 import { MarkerDetailDialog } from "@/src/features/map/components/MarkerDetailDialog";
 import { SignUpPromptDialog } from "@/src/features/user/components/SignUpPromptDialog";
 import { useSignUpPrompt } from "@/src/features/user/hooks/useSignUpPrompt";
@@ -116,8 +116,9 @@ export const MapClient: React.FC<MapClientProps> = ({ zoom }) => {
 
       </div>
 
-      <PinCreationDialog
+      <MapPostSheet
         isOpen={pinCreation.pinModalOpen}
+        onClose={pinCreation.cancelPin}
         pendingPin={pinCreation.pendingPin}
         threadName={pinCreation.threadName}
         category={pinCreation.category}
