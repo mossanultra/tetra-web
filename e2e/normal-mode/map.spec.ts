@@ -17,21 +17,21 @@ test.describe("Normal Mode - Map", () => {
       .first()
       .click({ position: { x: 200, y: 200 } });
 
-    // 2. Verify PinCreationDialog is visible
+    // 2. Verify MapPostSheet is visible
     const dialog = page
       .getByRole("dialog")
-      .filter({ has: page.getByRole("heading", { name: "新しいピン" }) });
+      .filter({ has: page.getByRole("heading", { name: "ピンを立てる" }) });
     await expect(dialog).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "新しいピン" }),
+      page.getByRole("heading", { name: "ピンを立てる" }),
     ).toBeVisible();
 
     // 3. Switch to "Event" category
-    await page.locator("select").selectOption("event");
+    await page.getByRole("button", { name: "イベント" }).click();
 
     // 4. Fill form
     const threadName = `E2E Event Test ${Date.now()}`;
-    await page.getByPlaceholder("スレッド名を入力").fill(threadName);
+    await page.getByPlaceholder("タイトルを入力").fill(threadName);
 
     // Date inputs (datetime-local)
     // We need to provide a future date.
@@ -56,14 +56,14 @@ test.describe("Normal Mode - Map", () => {
     await dateInputs.nth(1).fill(format(end));
 
     await page
-      .getByPlaceholder("https://example.com")
+      .getByPlaceholder("https://...")
       .fill("https://example.com/e2e-test");
     await page
-      .getByPlaceholder("イベントの詳細を入力")
+      .getByPlaceholder("詳細を入力してください…")
       .fill("This is an E2E test event.");
 
     // 5. Submit
-    await page.getByRole("button", { name: "ピンを立てる" }).click();
+    await page.getByRole("button", { name: "この内容でピンを立てる" }).click();
 
     // 6. Verify dialog close
     await expect(dialog).not.toBeVisible();

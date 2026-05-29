@@ -108,7 +108,7 @@ export default function SidebarNavigation() {
         })}
         
         <div className="pt-4 px-3">
-          <button onClick={openPost} className="w-full h-11 rounded-full text-white text-sm font-bold shadow-md transition-transform hover:scale-105 bg-brand">
+          <button onClick={openPost} aria-label="新規投稿" className="w-full h-11 rounded-full text-white text-sm font-bold shadow-md transition-transform hover:scale-105 bg-brand">
             投稿する
           </button>
         </div>

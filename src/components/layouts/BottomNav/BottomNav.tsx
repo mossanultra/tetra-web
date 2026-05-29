@@ -65,6 +65,7 @@ const BottomNav: React.FC = () => {
       {/* Floating Action Button */}
       <button
         onClick={openPost}
+        aria-label="新規投稿"
         className="absolute left-1/2 flex flex-col items-center bg-transparent transition-transform hover:scale-105 active:scale-95"
         style={{ transform: "translate(-50%, -52%)", top: 0, zIndex: 31 }}
       >

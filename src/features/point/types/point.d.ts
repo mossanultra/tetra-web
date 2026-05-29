@@ -18,8 +18,9 @@ export interface CreateEventPointRequest {
   endDate: string;
   detail?: string;
   url?: string;
-  url?: string;
   imageUrl?: string;
+  iconEmoji?: string;
+  iconColor?: string;
 }
 
 export interface CreateChatPointRequest {
@@ -28,4 +29,6 @@ export interface CreateChatPointRequest {
   threadName: string;
   category: string;
   imageUrl?: string;
+  iconEmoji?: string;
+  iconColor?: string;
 }

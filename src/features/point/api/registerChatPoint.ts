@@ -9,6 +9,8 @@ export async function registerChatPoint(
   formData.append("threadName", req.threadName);
   formData.append("category", req.category);
   if (req.imageUrl) formData.append("imageUrl", req.imageUrl);
+  if (req.iconEmoji) formData.append("iconEmoji", req.iconEmoji);
+  if (req.iconColor) formData.append("iconColor", req.iconColor);
 
   const res = await fetch("/api/map/chat", {
     method: "POST",

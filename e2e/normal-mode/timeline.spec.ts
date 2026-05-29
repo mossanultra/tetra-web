@@ -13,24 +13,27 @@ test.describe("Normal Mode - Timeline", () => {
   test("should allow creating a text post", async ({ page }) => {
     // Open Create Modal
     await page.getByLabel("新規投稿").click();
-    await expect(page.getByText("新規投稿")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "掲示板を投稿する" })).toBeVisible();
 
-    // Fill text
-    const testText = `Test Post ${Date.now()}`;
-    await page.getByPlaceholder("いまどうしてる？").fill(testText);
+    // Fill Title and detail
+    const testTitle = `Test Title ${Date.now()}`;
+    const testText = `Test Detail ${Date.now()}`;
+    await page.getByPlaceholder("タイトルを入力").fill(testTitle);
+    await page.getByPlaceholder("詳細を入力してください…").fill(testText);
 
     // Submit
-    await page.getByRole("button", { name: "投稿する" }).click();
+    await page.getByRole("button", { name: "この内容で投稿する" }).click();
 
     // Verify post appears in timeline (wait for it)
     await expect(
-      page.locator("article").filter({ hasText: testText }).first(),
+      page.locator("article").filter({ hasText: testTitle }).first(),
     ).toBeVisible();
   });
 
   test("should allow creating an image post", async ({ page }) => {
     // Open Create Modal
     await page.getByLabel("新規投稿").click();
+    await expect(page.getByRole("heading", { name: "掲示板を投稿する" })).toBeVisible();
 
     // Upload image
     // Using a base64 png buffer
@@ -43,16 +46,18 @@ test.describe("Normal Mode - Timeline", () => {
       ),
     });
 
+    const testTitle = `Image Post Title ${Date.now()}`;
     const testText = `Image Post ${Date.now()}`;
-    await page.getByPlaceholder("いまどうしてる？").fill(testText);
+    await page.getByPlaceholder("タイトルを入力").fill(testTitle);
+    await page.getByPlaceholder("詳細を入力してください…").fill(testText);
 
     // Submit
-    await page.getByRole("button", { name: "投稿する" }).click();
+    await page.getByRole("button", { name: "この内容で投稿する" }).click();
 
     // Verify post appears
     const newPost = page
       .locator("article")
-      .filter({ hasText: testText })
+      .filter({ hasText: testTitle })
       .first();
     await expect(newPost).toBeVisible();
     // Verify image presence
@@ -63,12 +68,13 @@ test.describe("Normal Mode - Timeline", () => {
     // Ensure we have a post to reply to
     // Create one for this test specifically to avoid dependencies
     await page.getByLabel("新規投稿").click();
-    const postText = `Reply Target ${Date.now()}`;
-    await page.getByPlaceholder("いまどうしてる？").fill(postText);
-    await page.getByRole("button", { name: "投稿する" }).click();
+    const postTitle = `Reply Target ${Date.now()}`;
+    await page.getByPlaceholder("タイトルを入力").fill(postTitle);
+    await page.getByPlaceholder("詳細を入力してください…").fill("Details");
+    await page.getByRole("button", { name: "この内容で投稿する" }).click();
 
     // Wait for it
-    const targetPost = page.locator("article", { hasText: postText }).first();
+    const targetPost = page.locator("article", { hasText: postTitle }).first();
     await expect(targetPost).toBeVisible();
 
     // Click reply button
@@ -93,13 +99,14 @@ test.describe("Normal Mode - Timeline", () => {
   test("should allow deleting own post", async ({ page }) => {
     // Create a temporary post for deletion to avoid destroying data
     await page.getByLabel("新規投稿").click();
-    const deleteTestText = `Delete Me ${Date.now()}`;
-    await page.getByPlaceholder("いまどうしてる？").fill(deleteTestText);
-    await page.getByRole("button", { name: "投稿する" }).click();
+    const deleteTestTitle = `Delete Me ${Date.now()}`;
+    await page.getByPlaceholder("タイトルを入力").fill(deleteTestTitle);
+    await page.getByPlaceholder("詳細を入力してください…").fill("Details");
+    await page.getByRole("button", { name: "この内容で投稿する" }).click();
 
     // Wait for it to appear
     const newPost = page
-      .locator("article", { hasText: deleteTestText })
+      .locator("article", { hasText: deleteTestTitle })
       .first();
     await expect(newPost).toBeVisible();
 

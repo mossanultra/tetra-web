@@ -13,6 +13,8 @@ export async function registerEventPoint(
   if (req.detail) formData.append("detail", req.detail);
   if (req.url) formData.append("url", req.url);
   if (req.imageUrl) formData.append("imageUrl", req.imageUrl);
+  if (req.iconEmoji) formData.append("iconEmoji", req.iconEmoji);
+  if (req.iconColor) formData.append("iconColor", req.iconColor);
 
   const res = await fetch("/api/map/event", {
     method: "POST",
