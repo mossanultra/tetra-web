@@ -20,7 +20,21 @@ export const PostSheet: React.FC<PostSheetProps> = ({ isOpen, onClose }) => {
   const [detail, setDetail] = useState("");
   const [images, setImages] = useState<(File | null)[]>([null, null]);
   const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([null, null]);
+  const [selectedIcon, setSelectedIcon] = useState<{ emoji: string; color: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const ICONS = [
+    { emoji: "🔥", color: "#F97316" },
+    { emoji: "🎨", color: "#EC4899" },
+    { emoji: "☕", color: "#3B82F6" },
+    { emoji: "🎉", color: "#8B5CF6" },
+    { emoji: "💪", color: "#10B981" },
+    { emoji: "🍜", color: "#1A6B5A" },
+    { emoji: "🌸", color: "#F59E0B" },
+    { emoji: "⚽", color: "#EF4444" },
+    { emoji: "🎵", color: "#6366F1" },
+    { emoji: "🐟", color: "#0EA5E9" },
+  ];
 
   const fileInputRef1 = useRef<HTMLInputElement>(null);
   const fileInputRef2 = useRef<HTMLInputElement>(null);
@@ -95,6 +109,8 @@ export const PostSheet: React.FC<PostSheetProps> = ({ isOpen, onClose }) => {
         category: selectedGenre,
         url,
         detail,
+        iconEmoji: selectedIcon?.emoji,
+        iconColor: selectedIcon?.color,
       });
 
       // リセット
@@ -103,6 +119,7 @@ export const PostSheet: React.FC<PostSheetProps> = ({ isOpen, onClose }) => {
       setDetail("");
       setImages([null, null]);
       setImagePreviews([null, null]);
+      setSelectedIcon(null);
 
       handleClose();
       router.refresh();
@@ -282,8 +299,45 @@ export const PostSheet: React.FC<PostSheetProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
           
-          <button 
-            onClick={handleSubmit} 
+          <div>
+            <label className="block text-xs font-bold text-gray-500 mb-2">
+              マップに表示するアイコン{" "}
+              <span className="font-normal text-gray-400">（タップして選択）</span>
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {ICONS.map((icon, idx) => {
+                const isSelected = selectedIcon?.emoji === icon.emoji;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSelectedIcon(isSelected ? null : icon)}
+                    className="w-11 h-11 rounded-full text-xl flex items-center justify-center border-2 transition-colors"
+                    style={{
+                      borderColor: isSelected ? icon.color : "transparent",
+                      background: isSelected ? `${icon.color}22` : "#F9FAFB",
+                    }}
+                  >
+                    {icon.emoji}
+                  </button>
+                );
+              })}
+            </div>
+            {selectedIcon && (
+              <div className="mt-2.5 flex items-center gap-2 fade-in">
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-lg shadow-sm flex-shrink-0"
+                  style={{ background: selectedIcon.color }}
+                >
+                  {selectedIcon.emoji}
+                </div>
+                <p className="text-xs text-gray-500">このアイコンがマップに表示されます</p>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleSubmit}
             disabled={submitting || !title.trim()}
             className="w-full h-12 rounded-full text-white text-sm font-black bg-gradient-to-r from-brand to-brand-mid disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-[0.98]"
           >
